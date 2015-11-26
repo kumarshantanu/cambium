@@ -1,6 +1,6 @@
-(defproject cambium "0.1.0-SNAPSHOT"
+(defproject cambium "0.1.0"
   :description "Clojure wrapper for SLF4j with MDC and clojure/tools.logging"
-  :url "http://example.com/FIXME"
+  :url "https://github.com/kumarshantanu/cambium"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.slf4j/slf4j-api       "1.7.12"]

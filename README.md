@@ -6,7 +6,10 @@ Clojure wrapper for [SLF4j](http://www.slf4j.org/) with
 
 ## Usage
 
-Leiningen coordinates: `[cambium "0.1.0-SNAPSHOT"]`
+Leiningen coordinates: `[cambium "0.1.0"]`
+
+_Note: Cambium only wraps over SLF4j. You also need a suitable SLF4j implementation, such as
+[logback-bundle](https://github.com/kumarshantanu/logback-bundle) as your project dependency._
 
 Require the namespace:
 
