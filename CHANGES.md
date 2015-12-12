@@ -3,7 +3,7 @@
 ## 0.2.0 / 2015-December-??
 
 * Bump SLF4j-API dependency version to `1.7.13`
-* [TODO] Support for read context values
+* Support for reading context values
 
 
 ## 0.1.0 / 2015-November-26

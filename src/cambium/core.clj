@@ -16,6 +16,19 @@
     [org.slf4j MDC]))
 
 
+(defn get-context
+  "Return a copy of the current context containing string keys and values."
+  ^java.util.Map []
+  (MDC/getCopyOfContextMap))
+
+
+(defn context-val
+  "Return the value of the specified key from the current context; behavior for non-existent keys would be
+  implemnentation dependent - it may return nil or may throw exception."
+  ^java.lang.String [k]
+  (MDC/get (i/as-str k)))
+
+
 (defn set-logging-context!
   "Set the logging context using specified map data, unless the specified identifier key already exists.
   Nil keys and values are ignored."

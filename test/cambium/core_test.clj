@@ -9,6 +9,9 @@
     (c/info "hello")
     (c/info {:foo "bar"} "hello with context")
     (c/with-logging-context {:extra "context"}
+      (is (= (c/get-context) {"extra" "context"}))
+      (is (= (c/context-val :extra) "context"))
+      (is (nil? (c/context-val "foo")))
       (c/info {:foo "bar"} "hello with wrapped context"))
     (c/error {} (ex-info "some error" {:data :foo}) "internal error"))
   (testing "custom loggers"
