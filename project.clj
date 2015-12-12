@@ -13,5 +13,5 @@
              :c16 {:dependencies [[org.clojure/clojure "1.6.0"]]}
              :c17 {:dependencies [[org.clojure/clojure "1.7.0"]]
                    :global-vars {*unchecked-math* :warn-on-boxed}}
-             :c18 {:dependencies [[org.clojure/clojure "1.8.0-RC2"]]
+             :c18 {:dependencies [[org.clojure/clojure "1.8.0-RC3"]]
                    :global-vars {*unchecked-math* :warn-on-boxed}}})
