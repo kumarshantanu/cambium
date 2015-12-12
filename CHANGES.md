@@ -1,6 +1,7 @@
 # Changes and TODO
 
-## 0.2.0 / 2015-December-??
+
+## 0.2.0 / 2015-December-12
 
 * Bump SLF4j-API dependency version to `1.7.13`
 * Support for reading context values
