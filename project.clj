@@ -1,9 +1,9 @@
-(defproject cambium "0.1.0"
+(defproject cambium "0.2.0-SNAPSHOT"
   :description "Clojure wrapper for SLF4j with MDC and clojure/tools.logging"
   :url "https://github.com/kumarshantanu/cambium"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[org.slf4j/slf4j-api       "1.7.12"]
+  :dependencies [[org.slf4j/slf4j-api       "1.7.13"]
                  [org.clojure/tools.logging "0.3.1" :exclusions [org.clojure/clojure]]]
   :global-vars {*warn-on-reflection* true}
   :profiles {:dev {:dependencies [[org.clojure/tools.nrepl "0.2.10"]
