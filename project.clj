@@ -14,4 +14,8 @@
              :c17 {:dependencies [[org.clojure/clojure "1.7.0"]]
                    :global-vars {*unchecked-math* :warn-on-boxed}}
              :c18 {:dependencies [[org.clojure/clojure "1.8.0-RC3"]]
-                   :global-vars {*unchecked-math* :warn-on-boxed}}})
+                   :global-vars {*unchecked-math* :warn-on-boxed}}}
+  :plugins [[lein-codox "0.9.4"]]
+  :codox {:namespaces [cambium.core]
+          :source-uri "http://github.com/kumarshantanu/cambium/blob/v{version}/{filepath}#L{line}"})
+
