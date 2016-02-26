@@ -46,6 +46,11 @@ You can define custom loggers that you can use from any namespace as follows:
 ```
 
 
+## API Documentation
+
+http://kumarshantanu.github.io/projects/cambium/
+
+
 ## License
 
 Copyright © 2015 Shantanu Kumar (kumar.shantanu@gmail.com, shantanu.kumar@concur.com)
