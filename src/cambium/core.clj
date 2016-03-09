@@ -9,6 +9,7 @@
 
 (ns cambium.core
   (:require
+    [clojure.edn                :as edn]
     [clojure.tools.logging      :as ctl]
     [clojure.tools.logging.impl :as ctl-impl]
     [cambium.internal           :as i])
@@ -29,13 +30,59 @@
   (MDC/get (i/as-str k)))
 
 
+(defn encode-val
+  "Encode MDC value as string such that it retains type information.
+  See: decode-val"
+  (^String [object-encoder v]
+    (let [hint-str (fn ^String [^String hint v]
+                     (let [^StringBuilder sb (StringBuilder. 15)]
+                       (.append sb hint)
+                       (.append sb v)
+                       (.toString sb)))]
+      (cond
+        (string? v)  v
+        (instance?
+          clojure.lang.Named v) (name v)
+        (integer? v) (hint-str "^long "    v)
+        (float? v)   (hint-str "^double "  v)
+        (instance?
+          Boolean v) (hint-str "^boolean " v)
+        :otherwise   (hint-str "^object "  (object-encoder v)))))
+  (^String [v]
+    (encode-val pr-str v)))
+
+
+(defn decode-val
+  "Decode MDC string value into the correct original type.
+  See: encode-val"
+  ([object-decoder ^String s]
+    (cond
+      (nil? s)             s
+      (= 0 (.length s))    s
+      (= \^ (.charAt s 0)) (cond
+                             (.startsWith s "^long ")    (try (Long/parseLong     (subs s 6)) (catch Exception e -314))
+                             (.startsWith s "^double ")  (try (Double/parseDouble (subs s 8)) (catch Exception e -3.14))
+                             (.startsWith s "^boolean ") (Boolean/parseBoolean    (subs s 9))
+                             (.startsWith s "^object ")  (try (object-decoder (subs s 8)) (catch Exception e (str e)))
+                             :otherwise                  s)
+      :otherwise           s))
+  ([^String s]
+    (decode-val edn/read-string s)))
+
+
+(def stringify-val
+  "Arity-1 fn to convert MDC value into a string. By default this carries out a plain string conversion.
+  See: encode-val"
+  i/as-str)
+
+
 (defn set-logging-context!
   "Set the logging context using specified map data, unless the specified identifier key already exists.
   Nil keys and values are ignored."
   ([context]
     (i/do-pairs context k v
       (when-not (or (nil? k) (nil? v))
-        (MDC/put (i/as-str k) (i/as-str v)))))
+        (MDC/put (i/as-str k) (stringify-val v)))))
   ([context k]
     (when-not (MDC/get (i/as-str k))
       (set-logging-context! context))))

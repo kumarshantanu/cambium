@@ -16,9 +16,9 @@
 (deftest log-test
   (testing "Normal scenarios"
     (c/info "hello")
-    (c/info {:foo "bar"} "hello with context")
-    (c/with-logging-context {:extra "context"}
-      (is (= (c/get-context) {"extra" "context"}))
+    (c/info {:foo "bar" :baz 10 :qux true} "hello with context")
+    (c/with-logging-context {:extra "context" "data" [1 2 :three 'four]}
+      (is (= (c/get-context) {"extra" "context" "data" "[1 2 :three four]"}))
       (is (= (c/context-val :extra) "context"))
       (is (nil? (c/context-val "foo")))
       (c/info {:foo "bar"} "hello with wrapped context"))
@@ -26,4 +26,27 @@
   (testing "custom loggers"
     (tu/metrics {:latency-ns 430 :module "registration"} "op.latency")
     (tu/metrics {:module "registration"} (ex-info "some error" {:data :foo}) "internal error")
-    (tu/txn-metrics {:module "order-fetch"} "Fetched order #4568")))
+    (tu/txn-metrics {:module "order-fetch"} "Fetched order #4568"))
+  (testing "type-safe encoding"
+    (alter-var-root #'c/stringify-val (constantly c/encode-val))
+    (c/info "hello")
+    (c/info {:foo "bar" :baz 10 :qux true} "hello with context")
+    (c/with-logging-context {:extra "context" "data" [1 2 :three 'four]}
+      (is (= (c/get-context) {"extra" "context" "data" "^object [1 2 :three four]"}))
+      (is (= (c/context-val :extra) "context"))
+      (is (nil? (c/context-val "foo")))
+      (c/info {:foo "bar"} "hello with wrapped context"))
+    (c/error {} (ex-info "some error" {:data :foo}) "internal error")))
+
+
+(deftest test-codec
+  (let [payload (c/encode-val :foo)]  (is (= "foo" payload))           (is (= "foo" (c/decode-val payload))))
+  (let [payload (c/encode-val 'foo)]  (is (= "foo" payload))           (is (= "foo" (c/decode-val payload))))
+  (let [payload (c/encode-val "foo")] (is (= "foo" payload))           (is (= "foo" (c/decode-val payload))))
+  (let [payload (c/encode-val 10)]    (is (= "^long 10" payload))      (is (= 10    (c/decode-val payload))))
+  (let [payload (c/encode-val 1.2)]   (is (= "^double 1.2" payload))   (is (= 1.2   (c/decode-val payload))))
+  (let [payload (c/encode-val true)]  (is (= "^boolean true" payload)) (is (= true  (c/decode-val payload))))
+  (let [payload (c/encode-val nil)]   (is (= "^object nil" payload))   (is (= nil   (c/decode-val payload))))
+  (let [payload (c/encode-val
+                  [1 :two 'four])]    (is (= "^object [1 :two four]"
+                                            payload))                  (is (= [1 :two 'four] (c/decode-val payload)))))
