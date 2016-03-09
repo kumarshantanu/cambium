@@ -18,4 +18,3 @@
   :plugins [[lein-codox "0.9.4"]]
   :codox {:namespaces [cambium.core]
           :source-uri "http://github.com/kumarshantanu/cambium/blob/v{version}/{filepath}#L{line}"})
-
