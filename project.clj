@@ -1,4 +1,4 @@
-(defproject cambium "0.3.1-SNAPSHOT"
+(defproject cambium "0.3.1"
   :description "Clojure wrapper for SLF4j with MDC and clojure/tools.logging"
   :url "https://github.com/kumarshantanu/cambium"
   :license {:name "Eclipse Public License"
@@ -19,3 +19,4 @@
   :plugins [[lein-codox "0.9.4"]]
   :codox {:namespaces [cambium.core]
           :source-uri "http://github.com/kumarshantanu/cambium/blob/v{version}/{filepath}#L{line}"})
+

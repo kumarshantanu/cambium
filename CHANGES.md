@@ -1,7 +1,7 @@
 # Changes and TODO
 
 
-## 0.3.1 / 2016-March-??
+## 0.3.1 / 2016-March-10
 
 * Allow redefinition of `cambium.core/stringify-val` even when Clojure 1.8+ direct-linking is enabled
 
