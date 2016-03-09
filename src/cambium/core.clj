@@ -70,7 +70,7 @@
     (decode-val edn/read-string s)))
 
 
-(def stringify-val
+(def ^:redef stringify-val
   "Arity-1 fn to convert MDC value into a string. By default this carries out a plain string conversion.
   See: encode-val"
   i/as-str)

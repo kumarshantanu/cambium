@@ -1,6 +1,11 @@
 # Changes and TODO
 
 
+## 0.3.1 / 2016-March-??
+
+* Allow redefinition of `cambium.core/stringify-val` even when Clojure 1.8+ direct-linking is enabled
+
+
 ## 0.3.0 / 2016-March-09
 
 * Bump SLF4j-API dependency version to `1.7.18`
