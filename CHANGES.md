@@ -1,6 +1,13 @@
 # Changes and TODO
 
 
+## 0.3.0 / 2016-March-09
+
+* Bump SLF4j-API dependency version to `1.7.18`
+* String conversion of MDC values is now via `cambium.core/stringify-val` (can be updated to suit needs)
+* Helper functions `cambium.core/encode-val` and `cambium.core/decode-val` to handle type-safe encoding
+
+
 ## 0.2.0 / 2015-December-12
 
 * Bump SLF4j-API dependency version to `1.7.13`
