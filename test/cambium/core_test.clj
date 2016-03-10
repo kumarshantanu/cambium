@@ -28,12 +28,14 @@
     (tu/metrics {:module "registration"} (ex-info "some error" {:data :foo}) "internal error")
     (tu/txn-metrics {:module "order-fetch"} "Fetched order #4568"))
   (testing "type-safe encoding"
+    (alter-var-root #'c/stringify-key (fn [f]
+                                        (fn ^String [x] (.replace ^String (f x) \- \_))))
     (alter-var-root #'c/stringify-val (constantly c/encode-val))
     (c/info "hello")
-    (c/info {:foo "bar" :baz 10 :qux true} "hello with context")
-    (c/with-logging-context {:extra "context" "data" [1 2 :three 'four]}
-      (is (= (c/get-context) {"extra" "context" "data" "^object [1 2 :three four]"}))
-      (is (= (c/context-val :extra) "context"))
+    (c/info {:foo-k "bar" :baz 10 :qux true} "hello with context")
+    (c/with-logging-context {:extra-k "context" "some-data" [1 2 :three 'four]}
+      (is (= (c/get-context) {"extra_k" "context" "some_data" "^object [1 2 :three four]"}))
+      (is (= (c/context-val :extra-k) "context"))
       (is (nil? (c/context-val "foo")))
       (c/info {:foo "bar"} "hello with wrapped context"))
     (c/error {} (ex-info "some error" {:data :foo}) "internal error")))

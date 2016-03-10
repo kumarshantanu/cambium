@@ -23,11 +23,16 @@
   (MDC/getCopyOfContextMap))
 
 
+(def ^:redef stringify-key
+  "Arity-1 fn to convert MDC key into a string. By default this carries out a plain string conversion."
+  i/as-str)
+
+
 (defn context-val
   "Return the value of the specified key from the current context; behavior for non-existent keys would be
   implemnentation dependent - it may return nil or may throw exception."
   ^java.lang.String [k]
-  (MDC/get (i/as-str k)))
+  (MDC/get (stringify-key k)))
 
 
 (defn encode-val
@@ -82,7 +87,7 @@
   ([context]
     (i/do-pairs context k v
       (when-not (or (nil? k) (nil? v))
-        (MDC/put (i/as-str k) (stringify-val v)))))
+        (MDC/put (stringify-key k) (stringify-val v)))))
   ([context k]
     (when-not (MDC/get (i/as-str k))
       (set-logging-context! context))))
