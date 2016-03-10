@@ -1,4 +1,4 @@
-(defproject cambium "0.3.2-SNAPSHOT"
+(defproject cambium "0.3.2"
   :description "Clojure wrapper for SLF4j with MDC and clojure/tools.logging"
   :url "https://github.com/kumarshantanu/cambium"
   :license {:name "Eclipse Public License"
