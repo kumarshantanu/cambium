@@ -17,15 +17,21 @@
     [org.slf4j MDC]))
 
 
+(def ^:redef stringify-key
+  "Arity-1 fn to convert MDC key into a string. By default this carries out a plain string conversion."
+  i/as-str)
+
+
+(def ^:redef stringify-val
+  "Arity-1 fn to convert MDC value into a string. By default this carries out a plain string conversion.
+  See: encode-val"
+  i/as-str)
+
+
 (defn get-context
   "Return a copy of the current context containing string keys and values."
   ^java.util.Map []
   (MDC/getCopyOfContextMap))
-
-
-(def ^:redef stringify-key
-  "Arity-1 fn to convert MDC key into a string. By default this carries out a plain string conversion."
-  i/as-str)
 
 
 (defn context-val
@@ -73,12 +79,6 @@
       :otherwise           s))
   ([^String s]
     (decode-val edn/read-string s)))
-
-
-(def ^:redef stringify-val
-  "Arity-1 fn to convert MDC value into a string. By default this carries out a plain string conversion.
-  See: encode-val"
-  i/as-str)
 
 
 (defn set-logging-context!
