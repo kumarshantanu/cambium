@@ -1,6 +1,12 @@
 # Changes and TODO
 
 
+## 0.3.3 / 2016-May-13
+
+* MDC string values deserialized back to original using `cambium.core/destringify-val` (can be redefined) 
+* Use function `cambium.core/destringify-val` when obtaining context values
+
+
 ## 0.3.2 / 2016-March-10
 
 * Use function `cambium.core/stringify-key` to convert MDC key to string (can be redefined)
