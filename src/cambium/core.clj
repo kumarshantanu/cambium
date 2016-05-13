@@ -28,6 +28,12 @@
   i/as-str)
 
 
+(def ^:redef destringify-val
+  "Arity-1 fn to convert MDC string back to original value. By default this simply returns the stored String value.
+  See: decode-val"
+  identity)
+
+
 (defn get-context
   "Return a copy of the current context containing string keys and values."
   ^java.util.Map []
@@ -37,8 +43,8 @@
 (defn context-val
   "Return the value of the specified key from the current context; behavior for non-existent keys would be
   implemnentation dependent - it may return nil or may throw exception."
-  ^java.lang.String [k]
-  (MDC/get (stringify-key k)))
+  [k]
+  (destringify-val (MDC/get (stringify-key k))))
 
 
 (defn encode-val
