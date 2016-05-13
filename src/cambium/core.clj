@@ -37,7 +37,9 @@
 (defn get-context
   "Return a copy of the current context containing string keys and values."
   ^java.util.Map []
-  (MDC/getCopyOfContextMap))
+  (let [cm (MDC/getCopyOfContextMap)
+        ks (keys cm)]
+    (zipmap ks (map #(destringify-val (get cm %)) ks))))
 
 
 (defn context-val

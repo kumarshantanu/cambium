@@ -31,10 +31,11 @@
     (alter-var-root #'c/stringify-key (fn [f]
                                         (fn ^String [x] (.replace ^String (f x) \- \_))))
     (alter-var-root #'c/stringify-val (constantly c/encode-val))
+    (alter-var-root #'c/destringify-val (constantly c/decode-val))
     (c/info "hello")
     (c/info {:foo-k "bar" :baz 10 :qux true} "hello with context")
     (c/with-logging-context {:extra-k "context" "some-data" [1 2 :three 'four]}
-      (is (= (c/get-context) {"extra_k" "context" "some_data" "^object [1 2 :three four]"}))
+      (is (= (c/get-context) {"extra_k" "context" "some_data" [1 2 :three 'four]}))
       (is (= (c/context-val :extra-k) "context"))
       (is (nil? (c/context-val "foo")))
       (c/info {:foo "bar"} "hello with wrapped context"))
