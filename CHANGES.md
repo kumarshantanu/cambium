@@ -1,6 +1,12 @@
 # Changes and TODO
 
 
+## 0.3.4 / 2016-May-14
+
+* Bump SLF4j-API dependency version to `1.7.21`
+* Fix `cambium.core/get-context` to deserialize MDC values before returning
+
+
 ## 0.3.3 / 2016-May-13
 
 * MDC string values deserialized back to original using `cambium.core/destringify-val` (can be redefined) 
