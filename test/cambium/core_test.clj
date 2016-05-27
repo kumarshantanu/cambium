@@ -8,9 +8,10 @@
 
 
 (ns cambium.core-test
-  (:require [clojure.test :refer :all]
-            [cambium.core :as c]
-            [cambium.test-util :as tu]))
+  (:require
+    [clojure.test :refer :all]
+    [cambium.core :as c]
+    [cambium.test-util :as tu]))
 
 
 (deftest log-test
