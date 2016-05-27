@@ -26,7 +26,8 @@
 
 (defmacro with-raw-mdc
   "Given raw MDC map with string key/value pairs (which need no transformation), execute the body of code in the
-  specified logging context. Setting raw MDC maps is faster than value maps via cambium.core/with-logging-context.
+  specified logging context. Faster than cambium.core/with-logging-context but replaces entire context at once instead
+  of individual key/value pairs.
   See also: http://logback.qos.ch/manual/mdc.html"
   [mdc & body]
   `(preserving-mdc
@@ -36,8 +37,8 @@
 
 (defn wrap-raw-mdc
   "Wrap function f such that it is executed with the specified MDC. When no MDC is specified, the MDC at the time of
-  wrapping is used. The MDC is considered raw, i.e. is not converted to string key/value pairs. Setting raw MDC maps is
-  faster than value maps via cambium.core/wrap-logging-context.
+  wrapping is used. The MDC is considered raw, i.e. is not converted to string key/value pairs. Faster than
+  cambium.core/wrap-logging-context but replaces entire context at once instead of individual key/value pairs.
   See also: http://logback.qos.ch/manual/mdc.html"
   ([f]
     (wrap-raw-mdc (MDC/getCopyOfContextMap) f))

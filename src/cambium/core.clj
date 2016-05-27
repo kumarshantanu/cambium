@@ -91,7 +91,8 @@
 
 
 (defn set-logging-context!
-  "Set the logging context using specified map data, unless the specified identifier key already exists.
+  "Set the logging context using specified map data, unless the specified identifier key already exists. Keys present
+  in the current context continue to have old values unless they are overridden by the specified context map.
   Nil keys and values are ignored."
   ([context]
     (i/do-pairs context k v
@@ -132,6 +133,7 @@
 
 
 (defmacro log
+  "Log an event or message under specified logger and log-level."
   ([level msg]
     `(log (ctl-impl/get-logger ctl/*logger-factory* ~*ns*) ~level ~msg))
   ([level mdc throwable msg]
