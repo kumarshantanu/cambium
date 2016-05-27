@@ -20,5 +20,5 @@
                    :global-vars  {*unchecked-math* :warn-on-boxed}}
              :dln {:jvm-opts ["-Dclojure.compiler.direct-linking=true"]}}
   :plugins [[lein-codox "0.9.5"]]
-  :codox {:namespaces [cambium.core]
+  :codox {:namespaces [cambium.core cambium.mdc]
           :source-uri "http://github.com/kumarshantanu/cambium/blob/v{version}/{filepath}#L{line}"})
