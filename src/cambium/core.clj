@@ -12,7 +12,8 @@
     [clojure.edn                :as edn]
     [clojure.tools.logging      :as ctl]
     [clojure.tools.logging.impl :as ctl-impl]
-    [cambium.internal           :as i])
+    [cambium.internal           :as i]
+    [cambium.mdc                :as m])
   (:import
     [org.slf4j MDC]))
 
@@ -104,17 +105,24 @@
 (defmacro with-logging-context
   "Given map data (as context) and a body of code, set map data as Mapped Diagnostic Context (MDC) and execute body of
   code in that context. Nil keys and values are ignored.
-  See also: http://logback.qos.ch/manual/mdc.html"
+  See also: http://logback.qos.ch/manual/mdc.html and cambium.mdc/with-raw-mdc"
   [context & body]
-  `(let [context# ~context
-         old-ctx# (MDC/getCopyOfContextMap)]
-     (try
-       (set-logging-context! context#)
-       ~@body
-       (finally
-         (if old-ctx#
-           (MDC/setContextMap old-ctx#)
-           (MDC/clear))))))
+  `(m/preserving-mdc
+     (set-logging-context! ~context)
+     ~@body))
+
+
+(defn wrap-logging-context
+  "Wrap function f with the specified logging context.
+  See also: http://logback.qos.ch/manual/mdc.html and cambium.mdc/wrap-raw-mdc"
+  [context f]
+  (fn
+    ([]
+      (with-logging-context context
+        (f)))
+    ([& args]
+      (with-logging-context context
+        (apply f args)))))
 
 
 (defmacro log

@@ -1,6 +1,11 @@
 # Changes and TODO
 
 
+## 0.4.0 / 2016-May-??
+
+* Support for propagating raw and value based MDC across contexts
+
+
 ## 0.3.4 / 2016-May-14
 
 * Bump SLF4j-API dependency version to `1.7.21`
