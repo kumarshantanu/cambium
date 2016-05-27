@@ -6,7 +6,7 @@ Clojure wrapper for [SLF4j](http://www.slf4j.org/) with
 
 ## Usage
 
-Leiningen coordinates: `[cambium "0.3.4"]`
+Leiningen coordinates: `[cambium "0.4.0"]`
 
 _Note: Cambium only wraps over SLF4j. You also need a suitable SLF4j implementation, such as
 [logback-bundle](https://github.com/kumarshantanu/logback-bundle) as your project dependency._
@@ -15,6 +15,7 @@ Require the namespace:
 
 ```clojure
 (require '[cambium.core :as c])
+(require '[cambium.mdc  :as m])
 ```
 
 
@@ -43,6 +44,39 @@ You can define custom loggers that you can use from any namespace as follows:
 (metrics {:latency-ms 331 :module "registration"} "app.registration.success") ; context and message
 (txn-log {:module "order-processing"} exception "Stock unavailable")          ; context, exception and message
 (txn-log "Order processed")                                                   ; simple message logging
+```
+
+
+### Context propagation
+
+Value based context can be propagated as follows:
+
+```clojure
+;; Propagate specified context in current thread
+(c/with-logging-context {:user-id "X1234"}
+  ...
+  (c/info {:job-id 89} "User was assigned a new job")
+  ...)
+
+;; wrap an existing fn with specified context
+(c/wrap-logging-context {:user-id "X1234"} user-assign-job)  ; creates a wrapped fn that inherits specified context
+```
+
+#### MDC propagation
+
+Unlike value based propagation MDC propagation happens wholesale, i.e. the entire current MDC map is replaced with a
+new map. Also, no conversion is applied to MDC; they are required to have string keys and values. See example below:
+
+```clojure
+;; Propagate specified context in current thread
+(m/with-raw-mdc {"userid" "X1234"}
+  ...
+  (c/info {:job-id 89} "User was assigned a new job")
+  ...)
+
+;; wrap an existing fn with specified context
+(m/wrap-raw-mdc user-assign-job)  ; creates a wrapped fn that inherits current context
+(m/wrap-raw-mdc {"userid" "X1234"} user-assign-job)  ; creates a wrapped fn that inherits specified context
 ```
 
 

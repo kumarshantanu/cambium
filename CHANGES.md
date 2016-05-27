@@ -1,7 +1,7 @@
 # Changes and TODO
 
 
-## 0.4.0 / 2016-May-??
+## 0.4.0 / 2016-May-27
 
 * Support for propagating raw and value based MDC across contexts
 
