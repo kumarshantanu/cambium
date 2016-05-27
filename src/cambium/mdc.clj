@@ -46,6 +46,12 @@
       ([]
         (with-raw-mdc mdc
           (f)))
-      ([& args]
+      ([x]
         (with-raw-mdc mdc
-          (apply f args))))))
+          (f x)))
+      ([x y]
+        (with-raw-mdc mdc
+          (f x y)))
+      ([x y & args]
+        (with-raw-mdc mdc
+          (apply f x y args))))))

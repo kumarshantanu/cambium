@@ -120,9 +120,15 @@
     ([]
       (with-logging-context context
         (f)))
-    ([& args]
+    ([x]
       (with-logging-context context
-        (apply f args)))))
+        (f x)))
+    ([x y]
+      (with-logging-context context
+        (f x y)))
+    ([x y & args]
+      (with-logging-context context
+        (apply f x y args)))))
 
 
 (defmacro log
