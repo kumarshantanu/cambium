@@ -1,6 +1,17 @@
 # Changes and TODO
 
 
+## 0.5.0 / 2016-August-??
+
+* [TODO] Support for MDC nesting
+  * Extract nested value - `cambium.core/context-val-in`
+  * Set nested value - `cambium.core/set-context-in!`
+  * Eval body with nested MDC - `cambium.core/with-context-in`
+* [TODO] Deprecate `cambium.core/with-logging-context` and `cambium.core/set-logging context!`
+  * Recommend `cambium.core/set-context!` instead of `cambium.core/set-logging context!`
+  * Recommend `cambium.core/with-context` instead of `cambium.core/with-logging-context`
+
+
 ## 0.4.0 / 2016-May-27
 
 * Support for propagating raw and value based MDC across contexts
