@@ -18,6 +18,9 @@
     [org.slf4j MDC]))
 
 
+;; ----- global var hooks (with simple defaults) for MDC codec -----
+
+
 (def ^:redef stringify-key
   "Arity-1 fn to convert MDC key into a string. By default this carries out a plain string conversion."
   i/as-str)
@@ -35,19 +38,7 @@
   identity)
 
 
-(defn get-context
-  "Return a copy of the current context containing string keys and values."
-  ^java.util.Map []
-  (let [cm (MDC/getCopyOfContextMap)
-        ks (keys cm)]
-    (zipmap ks (map #(destringify-val (get cm %)) ks))))
-
-
-(defn context-val
-  "Return the value of the specified key from the current context; behavior for non-existent keys would be
-  implemnentation dependent - it may return nil or may throw exception."
-  [k]
-  (destringify-val (MDC/get (stringify-key k))))
+;; ----- EDN based codec helper -----
 
 
 (defn encode-val
@@ -88,6 +79,24 @@
       :otherwise           s))
   ([^String s]
     (decode-val edn/read-string s)))
+
+
+;; ----- MDC handling -----
+
+
+(defn get-context
+  "Return a copy of the current context containing string keys and original values."
+  ^java.util.Map []
+  (let [cm (MDC/getCopyOfContextMap)
+        ks (keys cm)]
+    (zipmap ks (map #(destringify-val (get cm %)) ks))))
+
+
+(defn context-val
+  "Return the value of the specified key from the current context; behavior for non-existent keys would be
+  implemnentation dependent - it may return nil or may throw exception."
+  [k]
+  (destringify-val (MDC/get (stringify-key k))))
 
 
 (defn set-logging-context!
@@ -132,6 +141,9 @@
         (apply f x y args)))))
 
 
+;; ----- logging calls -----
+
+
 (defmacro log
   "Log an event or message under specified logger and log-level."
   ([level msg]
@@ -169,6 +181,9 @@
 (deflevel warn)
 (deflevel error)
 (deflevel fatal)
+
+
+;; ----- making custom logger -----
 
 
 (defmacro deflogger
