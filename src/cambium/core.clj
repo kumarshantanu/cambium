@@ -15,6 +15,7 @@
     [cambium.internal           :as i]
     [cambium.mdc                :as m])
   (:import
+    [java.util HashMap]
     [org.slf4j MDC]))
 
 
@@ -93,10 +94,75 @@
 
 
 (defn context-val
-  "Return the value of the specified key from the current context; behavior for non-existent keys would be
-  implemnentation dependent - it may return nil or may throw exception."
+  "Return the value of the specified key (or keypath in nested structure) from the current context; behavior for
+  non-existent keys would be implemnentation dependent - it may return nil or may throw exception."
   [k]
-  (destringify-val (MDC/get (stringify-key k))))
+  (let [mdc-val #(destringify-val (MDC/get (stringify-key %)))]
+    (if (coll? k)
+      (get-in (mdc-val (first k)) (map stringify-key (next k)))
+      (mdc-val k))))
+
+
+(defn merge-context!
+  "Merge given 'potentially-nested' context map into the current MDC using the following constraints:
+  * Entries with nil key or nil value are ignored
+  * Collection keys are treated as key-path (all tokens in a key path are turned into string)
+  * Keys are converted to string
+  * When absent-k (second argument) is specified, context is set only if the key/path is absent
+  See also: cambium.core/stringify-key, cambium.core/stringify-val"
+  ([context]
+    (let [^HashMap delta (HashMap. (count context))]
+      ;; build up a delta with top-level stringified keys and original vals
+      (doseq [[k v] (seq context)]
+        (when-not (or (nil? k) (nil? v))
+          (if (coll? k)
+            (when (and (seq k) (every? #(not (nil? %)) k))
+              (let [k-path (map stringify-key k)
+                    k-head (first k-path)]
+                (.put delta k-head (-> (get delta k-head)
+                                     (or (when-let [oldval (MDC/get k-head)]
+                                           (let [oldmap (destringify-val oldval)]
+                                             (if (map? oldmap) oldmap {}))))
+                                     (assoc-in (next k-path) (i/stringify-nested-keys stringify-key v))))))
+            (.put delta (stringify-key k) (i/stringify-nested-keys stringify-key v)))))
+      ;; set the pairs from delta into the MDC
+      (doseq [[str-k v] (seq delta)]
+        (MDC/put str-k (stringify-val v)))))
+  ([context absent-k]
+    (when-not (context-val absent-k)
+      (merge-context! context))))
+
+
+(defmacro with-context
+  "Given 'potentially-nested' context map data, merge it into the current MDC and evaluate the body of code in that
+  context. Restore original context in the end.
+  See:
+    http://logback.qos.ch/manual/mdc.html
+    cambium.core/merge-context!
+    cambium.mdc/with-raw-mdc"
+  [context & body]
+  `(m/preserving-mdc
+     (merge-context! ~context)
+     ~@body))
+
+
+(defn wrap-context
+  "Wrap function f with the specified logging context.
+  See also: http://logback.qos.ch/manual/mdc.html and cambium.mdc/wrap-raw-mdc"
+  [context f]
+  (fn
+    ([]
+      (with-context context
+        (f)))
+    ([x]
+      (with-context context
+        (f x)))
+    ([x y]
+      (with-context context
+        (f x y)))
+    ([x y & args]
+      (with-context context
+        (apply f x y args)))))
 
 
 (defn set-logging-context!

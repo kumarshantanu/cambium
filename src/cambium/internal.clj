@@ -46,3 +46,13 @@
        (let [[~k-sym ~v-sym] (first coll#)]
          ~@body)
        (recur (next coll#)))))
+
+
+(defn stringify-nested-keys
+  "Given a potentially nested structure, turn all map keys to string using the stringify-key argument."
+  [stringify-key v]
+  (if (map? v)
+    (zipmap
+      (map stringify-key (keys v))
+      (map #(stringify-nested-keys stringify-key %) (vals v)))
+    v))

@@ -3,13 +3,15 @@
 
 ## 0.5.0 / 2016-August-??
 
-* [TODO] Support for MDC nesting
-  * Extract nested value - `cambium.core/context-val-in`
-  * Set nested value - `cambium.core/set-context-in!`
-  * Eval body with nested MDC - `cambium.core/with-context-in`
+* Support for nested MDC
+  * Make `cambium.core/context-val` support both top-level keys and key path for nested structures
+  * Add `cambium.core/merge-context!` to merge given 'potentially nested' context map into current MDC
+  * Add `cambium.core/with-context` to eval body with 'potentially nested' MDC
+  * Add `cambium.core/wrap-context` to wrap a function with 'potentially nested' MDC
 * [TODO] Deprecate `cambium.core/with-logging-context` and `cambium.core/set-logging context!`
-  * Recommend `cambium.core/set-context!` instead of `cambium.core/set-logging context!`
+  * Recommend `cambium.core/merge-context!` instead of `cambium.core/set-logging context!`
   * Recommend `cambium.core/with-context` instead of `cambium.core/with-logging-context`
+  * Recommend `cambium.core/wrap-context` instead of `cambium.core/wrap-logging-context`
 
 
 ## 0.4.0 / 2016-May-27
