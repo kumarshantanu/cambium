@@ -95,7 +95,10 @@
 
 (defn context-val
   "Return the value of the specified key (or keypath in nested structure) from the current context; behavior for
-  non-existent keys would be implemnentation dependent - it may return nil or may throw exception."
+  non-existent keys would be implementation dependent - it may return nil or may throw exception.
+  Note: For keypath lookup in nested context 'cambium.core/stringify-val' and 'cambium.core/destringify-val' must be
+        redefined to preserve structure.
+  See:  cambium.core/encode-val, cambium.core/decode-val"
   [k]
   (let [mdc-val #(destringify-val (MDC/get (stringify-key %)))]
     (if (coll? k)
@@ -109,7 +112,9 @@
   * Collection keys are treated as key-path (all tokens in a key path are turned into string)
   * Keys are converted to string
   * When absent-k (second argument) is specified, context is set only if the key/path is absent
-  See also: cambium.core/stringify-key, cambium.core/stringify-val"
+  Note: For nested context 'cambium.core/stringify-val' and 'cambium.core/destringify-val' must be redefined to
+        preserve structure.
+  See:  cambium.core/encode-val, cambium.core/decode-val"
   ([context]
     (let [^HashMap delta (HashMap. (count context))]
       ;; build up a delta with top-level stringified keys and original vals
@@ -136,10 +141,10 @@
 (defmacro with-context
   "Given 'potentially-nested' context map data, merge it into the current MDC and evaluate the body of code in that
   context. Restore original context in the end.
-  See:
-    http://logback.qos.ch/manual/mdc.html
-    cambium.core/merge-context!
-    cambium.mdc/with-raw-mdc"
+  Note: For nested context 'cambium.core/stringify-val' and 'cambium.core/destringify-val' must be redefined to
+        preserve structure.
+  See:  cambium.core/encode-val, cambium.core/decode-val, cambium.core/merge-context!, cambium.mdc/with-raw-mdc
+        http://logback.qos.ch/manual/mdc.html"
   [context & body]
   `(m/preserving-mdc
      (merge-context! ~context)
@@ -148,7 +153,10 @@
 
 (defn wrap-context
   "Wrap function f with the specified logging context.
-  See also: http://logback.qos.ch/manual/mdc.html and cambium.mdc/wrap-raw-mdc"
+  Note: For nested context 'cambium.core/stringify-val' and 'cambium.core/destringify-val' must be redefined to
+        preserve structure.
+  See:  cambium.core/encode-val, cambium.core/decode-val, cambium.mdc/wrap-raw-mdc
+        http://logback.qos.ch/manual/mdc.html"
   [context f]
   (fn
     ([]
