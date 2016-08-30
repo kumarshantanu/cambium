@@ -133,7 +133,7 @@
                                        (assoc-in (next k-path) (i/stringify-nested-keys stringify-key v))))))
               (.put delta (stringify-key k) (i/stringify-nested-keys stringify-key v))))))
       ;; set the pairs from delta into the MDC
-      (doseq [^Map$Entry pair (seq delta)]
+      (doseq [^Map$Entry pair (.entrySet delta)]
         (let [str-k (.getKey pair)
               v     (.getValue pair)]
           (MDC/put str-k (stringify-val v))))))
