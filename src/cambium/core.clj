@@ -15,7 +15,7 @@
     [cambium.internal           :as i]
     [cambium.mdc                :as m])
   (:import
-    [java.util HashMap]
+    [java.util HashMap Map$Entry]
     [org.slf4j MDC]))
 
 
@@ -118,21 +118,25 @@
   ([context]
     (let [^HashMap delta (HashMap. (count context))]
       ;; build up a delta with top-level stringified keys and original vals
-      (doseq [[k v] (seq context)]
-        (when-not (or (nil? k) (nil? v))
-          (if (coll? k)
-            (when (and (seq k) (every? #(not (nil? %)) k))
-              (let [k-path (map stringify-key k)
-                    k-head (first k-path)]
-                (.put delta k-head (-> (get delta k-head)
-                                     (or (when-let [oldval (MDC/get k-head)]
-                                           (let [oldmap (destringify-val oldval)]
-                                             (if (map? oldmap) oldmap {}))))
-                                     (assoc-in (next k-path) (i/stringify-nested-keys stringify-key v))))))
-            (.put delta (stringify-key k) (i/stringify-nested-keys stringify-key v)))))
+      (doseq [pair (seq context)]
+        (let [k (first pair)
+              v (second pair)]
+          (when-not (or (nil? k) (nil? v))
+            (if (coll? k)
+              (when (and (seq k) (every? #(not (nil? %)) k))
+                (let [k-path (map stringify-key k)
+                      k-head (first k-path)]
+                  (.put delta k-head (-> (get delta k-head)
+                                       (or (when-let [oldval (MDC/get k-head)]
+                                             (let [oldmap (destringify-val oldval)]
+                                               (if (map? oldmap) oldmap {}))))
+                                       (assoc-in (next k-path) (i/stringify-nested-keys stringify-key v))))))
+              (.put delta (stringify-key k) (i/stringify-nested-keys stringify-key v))))))
       ;; set the pairs from delta into the MDC
-      (doseq [[str-k v] (seq delta)]
-        (MDC/put str-k (stringify-val v)))))
+      (doseq [^Map$Entry pair (seq delta)]
+        (let [str-k (.getKey pair)
+              v     (.getValue pair)]
+          (MDC/put str-k (stringify-val v))))))
   ([context absent-k]
     (when-not (context-val absent-k)
       (merge-context! context))))
