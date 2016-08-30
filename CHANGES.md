@@ -5,9 +5,9 @@
 
 * Support for nested MDC
   * Make `cambium.core/context-val` support both top-level keys and key path for nested structures
-  * Add `cambium.core/merge-context!` to merge given 'potentially nested' context map into current MDC
-  * Add `cambium.core/with-context` to eval body with 'potentially nested' MDC
-  * Add `cambium.core/wrap-context` to wrap a function with 'potentially nested' MDC
+  * Add `cambium.core/merge-nested-context!` to merge 'potentially nested' context map into current MDC
+  * Add `cambium.core/with-nested-context` to evaluate body of code with 'potentially nested' MDC
+  * Add `cambium.core/wrap-nested-context` to wrap a function with 'potentially nested' MDC
 * BREAKING CHANGE: Rename `cambium.core/set-logging-context!` to `cambium.core/merge-logging-context!`
 
 

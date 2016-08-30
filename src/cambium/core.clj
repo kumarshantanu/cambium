@@ -106,7 +106,7 @@
       (mdc-val k))))
 
 
-(defn merge-context!
+(defn merge-nested-context!
   "Merge given 'potentially-nested' context map into the current MDC using the following constraints:
   * Entries with nil key or nil value are ignored
   * Collection keys are treated as key-path (all tokens in a key path are turned into string)
@@ -139,10 +139,10 @@
           (MDC/put str-k (stringify-val v))))))
   ([context absent-k]
     (when-not (context-val absent-k)
-      (merge-context! context))))
+      (merge-nested-context! context))))
 
 
-(defmacro with-context
+(defmacro with-nested-context
   "Given 'potentially-nested' context map data, merge it into the current MDC and evaluate the body of code in that
   context. Restore original context in the end.
   Note: For nested context 'cambium.core/stringify-val' and 'cambium.core/destringify-val' must be redefined to
@@ -151,11 +151,11 @@
         http://logback.qos.ch/manual/mdc.html"
   [context & body]
   `(m/preserving-mdc
-     (merge-context! ~context)
+     (merge-nested-context! ~context)
      ~@body))
 
 
-(defn wrap-context
+(defn wrap-nested-context
   "Wrap function f with the specified logging context.
   Note: For nested context 'cambium.core/stringify-val' and 'cambium.core/destringify-val' must be redefined to
         preserve structure.
@@ -164,16 +164,16 @@
   [context f]
   (fn
     ([]
-      (with-context context
+      (with-nested-context context
         (f)))
     ([x]
-      (with-context context
+      (with-nested-context context
         (f x)))
     ([x y]
-      (with-context context
+      (with-nested-context context
         (f x y)))
     ([x y & args]
-      (with-context context
+      (with-nested-context context
         (apply f x y args)))))
 
 
@@ -196,9 +196,13 @@
 
 
 (defmacro with-logging-context
-  "Given map data (as context) and a body of code, set map data as Mapped Diagnostic Context (MDC) and execute body of
-  code in that context. Nil keys and values are ignored.
-  See also: http://logback.qos.ch/manual/mdc.html and cambium.mdc/with-raw-mdc"
+  "Given context map data, merge it into the current MDC and evaluate the body of code in that context. Restore
+  original context in the end. Following constraints are applied:
+  * Nil keys and values are ignored
+  * Keys may not be nested (for nesting support consider 'cambium.core/with-context')
+  * Values are not inspected for nested structures
+  See: cambium.core/merge-logging-context!, cambium.core/with-context, cambium.mdc/with-raw-mdc
+       http://logback.qos.ch/manual/mdc.html"
   [context & body]
   `(m/preserving-mdc
      (merge-logging-context! ~context)
@@ -207,7 +211,8 @@
 
 (defn wrap-logging-context
   "Wrap function f with the specified logging context.
-  See also: http://logback.qos.ch/manual/mdc.html and cambium.mdc/wrap-raw-mdc"
+  See: cambium.core/with-logging-context, cambium.core/wrap-context, cambium.mdc/wrap-raw-mdc
+       http://logback.qos.ch/manual/mdc.html"
   [context f]
   (fn
     ([]

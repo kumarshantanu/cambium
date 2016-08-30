@@ -18,7 +18,7 @@
   (testing "Normal scenarios"
     (c/info "hello")
     (c/info {:foo "bar" :baz 10 :qux true} "hello with context")
-    (c/with-context {:extra "context" "data" [1 2 :three 'four]}
+    (c/with-nested-context {:extra "context" "data" [1 2 :three 'four]}
       (is (= (c/get-context) {"extra" "context" "data" "[1 2 :three four]"}))
       (is (= (c/context-val :extra) "context"))
       (is (nil? (c/context-val "foo")))
@@ -40,7 +40,7 @@
                     c/destringify-val c/decode-val]
         (c/info "hello")
         (c/info {:foo-k "bar" :baz 10 :qux true} "hello with context")
-        (c/with-context {:extra-k "context" "some-data" [1 2 :three 'four]}
+        (c/with-nested-context {:extra-k "context" "some-data" [1 2 :three 'four]}
           (is (= (c/get-context) {"extra_k" "context" "some_data" [1 2 :three 'four]}))
           (is (= (c/context-val :extra-k) "context"))
           (is (nil? (c/context-val "foo")))
@@ -70,15 +70,15 @@
             ([dummy arg]))]
     (testing "with-raw-mdc"
       (is (nil? (c/context-val :foo)) "Attribute not set must be absent before override")
-      (c/with-context context-old
+      (c/with-nested-context context-old
         (f)
-        (c/with-context context-new
+        (c/with-nested-context context-new
           (is (= "10" (c/context-val :foo)))
           (is (= "quux" (c/context-val :baz)) "Delta context override must not remove non-overridden attributes")
           (is (= "baz" (c/context-val :bar))))
         (with-redefs [cambium.core/stringify-val   cambium.core/encode-val
                       cambium.core/destringify-val cambium.core/decode-val]
-          (c/with-context nested-diff
+          (c/with-nested-context nested-diff
             (is (= {"learn-to-fly" {"title" "learn to fly"
                                     "year" 1999}
                     "best-of-you"  {"title" "best of you"
@@ -89,7 +89,7 @@
                     "year" 1999}
                   (c/context-val [:foo-fighter :learn-to-fly]))
               "deep nested map comes out as a map")
-            (c/with-context {[:foo-fighter :learn-to-fly :year] 2000}
+            (c/with-nested-context {[:foo-fighter :learn-to-fly :year] 2000}
               (is (= {"title" "learn to fly"
                       "year" 2000}
                     (c/context-val [:foo-fighter :learn-to-fly])))))))
@@ -102,11 +102,11 @@
       (is (nil? (c/context-val :foo)) "Attribute not set must be absent after restoration"))
     (testing "wrap-raw-mdc"
       (is (nil? (c/context-val :foo)))
-      ((c/wrap-context context-old f))
+      ((c/wrap-nested-context context-old f))
       ((c/wrap-logging-context context-old f))
-      ((c/wrap-context context-old f) :dummy :arg)
+      ((c/wrap-nested-context context-old f) :dummy :arg)
       ((c/wrap-logging-context context-old f) :dummy :arg)
-      ((comp (partial c/wrap-context context-new) (c/wrap-context context-old f)))
+      ((comp (partial c/wrap-nested-context context-new) (c/wrap-nested-context context-old f)))
       ((comp (partial c/wrap-logging-context context-new) (c/wrap-logging-context context-old f)))
       (is (nil? (c/context-val :foo))))))
 
