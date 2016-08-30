@@ -37,17 +37,6 @@
     :otherwise                       (strcat x)))
 
 
-(defmacro do-pairs
-  "Given a map m, loop over its pairs binding k-sym and v-sym to respective key and value, executing body of code for
-  each pair."
-  [m k-sym v-sym & body]
-  `(loop [coll# (seq ~m)]
-     (when coll#
-       (let [[~k-sym ~v-sym] (first coll#)]
-         ~@body)
-       (recur (next coll#)))))
-
-
 (defn stringify-nested-keys
   "Given a potentially nested structure, turn all map keys to string using the stringify-key argument."
   [stringify-key v]

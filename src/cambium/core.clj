@@ -173,17 +173,22 @@
         (apply f x y args)))))
 
 
-(defn set-logging-context!
-  "Set the logging context using specified map data, unless the specified identifier key already exists. Keys present
-  in the current context continue to have old values unless they are overridden by the specified context map.
-  Nil keys and values are ignored."
+(defn merge-logging-context!
+  "Merge given context map into the current MDC using the following constraints:
+  * Nil keys and values are ignored
+  * Keys are converted to string
+  * When absent-k (second argument) is specified, context is set only if the key is absent
+  * Keys in the current context continue to have old values unless they are overridden by the specified context map
+  * Keys in the context map may not be nested (for nesting support consider 'cambium.core/merge-context!')"
   ([context]
-    (i/do-pairs context k v
-      (when-not (or (nil? k) (nil? v))
-        (MDC/put (stringify-key k) (stringify-val v)))))
-  ([context k]
-    (when-not (MDC/get (i/as-str k))
-      (set-logging-context! context))))
+    (doseq [pair (seq context)]
+      (let [k (first pair)
+            v (second pair)]
+        (when-not (or (nil? k) (nil? v))
+          (MDC/put (stringify-key k) (stringify-val v))))))
+  ([context absent-k]
+    (when-not (MDC/get (stringify-key absent-k))
+      (merge-logging-context! context))))
 
 
 (defmacro with-logging-context
@@ -192,7 +197,7 @@
   See also: http://logback.qos.ch/manual/mdc.html and cambium.mdc/with-raw-mdc"
   [context & body]
   `(m/preserving-mdc
-     (set-logging-context! ~context)
+     (merge-logging-context! ~context)
      ~@body))
 
 
