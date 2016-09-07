@@ -1,7 +1,7 @@
 # Changes and TODO
 
 
-## 0.5.0 / 2016-August-??
+## 0.5.0 / 2016-September-07
 
 * Support for nested MDC
   * Make `cambium.core/context-val` support both top-level keys and key path for nested structures

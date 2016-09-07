@@ -6,7 +6,7 @@ Clojure wrapper for [SLF4j](http://www.slf4j.org/) with
 
 ## Usage
 
-Leiningen coordinates: `[cambium "0.4.0"]`
+Leiningen coordinates: `[cambium "0.5.0"]`
 
 _Note: Cambium only wraps over SLF4j. You also need a suitable SLF4j implementation, such as
 [logback-bundle](https://github.com/kumarshantanu/logback-bundle) as your project dependency._
@@ -77,6 +77,30 @@ new map. Also, no conversion is applied to MDC; they are required to have string
 ;; wrap an existing fn with specified context
 (m/wrap-raw-mdc user-assign-job)  ; creates a wrapped fn that inherits current context
 (m/wrap-raw-mdc {"userid" "X1234"} user-assign-job)  ; creates a wrapped fn that inherits specified context
+```
+
+#### Nested context
+
+_Note: This requires special logging layout implementation that can decode the encoded context._
+
+Context values sometimes may be nested and need manipulation. Cambium requires format-preserving codec to be configured
+ahead of using nested context:
+
+```clojure
+(alter-var-root #'cambium.core/stringify-val   (constantly cambium.core/encode-val)
+(alter-var-root #'cambium.core/destringify-val (constantly cambium.core/decode-val)
+```
+
+Also, for first-class handling of nested context, Cambium converts all tokens in a key path as string. See nesting
+example below:
+
+```clojure
+(c/with-logging-context {:order {:client "XYZ Corp"
+                                 :item-count 10}}
+  ;; ..other processing..
+  (c/with-nested-context {[:order :id] "F-123456"}
+    ;; here the context will be {"order" {"client" "XYZ Corp" "item-count" 10 "id" "F-123456"}}
+    (c/info "Order processed successfully")))
 ```
 
 
