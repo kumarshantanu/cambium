@@ -1,6 +1,16 @@
 # Changes and TODO
 
 
+## TODO
+
+* [TODO] Move nested-context API to `cambium.nested` namespace
+  * `merge-nested-context!`
+  * `with-nested-context`
+* [TODO] Add log macros with nested-context support to `cambium.nested` namespace
+  * `nested-context-val`
+  * `trace`, `debug`, `info`, `warn`, `error`, `fatal`
+
+
 ## 0.5.0 / 2016-September-07
 
 * Support for nested MDC
