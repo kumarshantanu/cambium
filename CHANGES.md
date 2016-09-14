@@ -3,6 +3,11 @@
 
 ## TODO
 
+No TODO!
+
+
+## 0.6.0 / 2016-September-??
+
 * [TODO] Move nested-context API to `cambium.nested` namespace
   * `merge-nested-context!`
   * `with-nested-context`
