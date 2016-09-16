@@ -8,12 +8,17 @@ No TODO!
 
 ## 0.6.0 / 2016-September-??
 
-* [TODO] Move nested-context API to `cambium.nested` namespace
-  * `merge-nested-context!`
-  * `with-nested-context`
-* [TODO] Add log macros with nested-context support to `cambium.nested` namespace
-  * `nested-context-val`
-  * `trace`, `debug`, `info`, `warn`, `error`, `fatal`
+* [TODO]-[BREAKING CHANGE] Move nested-context API to `cambium.nested` namespace
+  * Drop `cambium.core/merge-nested-context!` (moved to `cambium.nested/merge-logging-context!`)
+  * Drop `cambium.core/with-nested-context` (moved to `cambium.nested/with-logging-context`)
+  * Now `cambium.core/context-val` no more treats a collection as a nested path
+* Add API with nested-context support to the `cambium.nested` namespace
+  * `merge-logging-context!`
+  * `with-logging-context`
+  * `wrap-logging-context`
+  * `context-val`
+  * `log`, `trace`, `debug`, `info`, `warn`, `error`, `fatal`
+* [TODO] Make `cambium.core/encode-val` and `cambium.core/decode-val` safe for string
 
 
 ## 0.5.0 / 2016-September-07
