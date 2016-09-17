@@ -6,7 +6,7 @@ Clojure wrapper for [SLF4j](http://www.slf4j.org/) with
 
 ## Usage
 
-Leiningen coordinates: `[cambium "0.5.0"]`
+Leiningen coordinates: `[cambium "0.6.0"]`
 
 _Note: Cambium only wraps over SLF4j. You also need a suitable SLF4j implementation, such as
 [logback-bundle](https://github.com/kumarshantanu/logback-bundle) as your project dependency._
@@ -16,6 +16,7 @@ Require the namespace:
 ```clojure
 (require '[cambium.core :as c])
 (require '[cambium.mdc  :as m])
+(require '[cambium.nested :as n])
 ```
 
 
@@ -91,22 +92,19 @@ ahead of using nested context:
 (alter-var-root #'cambium.core/destringify-val (constantly cambium.core/decode-val)
 ```
 
-Also, for first-class handling of nested context, Cambium converts all tokens in a key path as string. See nesting
-example below:
+Also, for first-class handling of nested context, Cambium converts all tokens in a key path as string tokens. See
+nesting example below:
 
 ```clojure
-(c/with-logging-context {:order {:client "XYZ Corp"
+(n/with-logging-context {:order {:client "XYZ Corp"
                                  :item-count 10}}
   ;; ..other processing..
-  (c/with-nested-context {[:order :id] "F-123456"}
+  (n/with-logging-context {[:order :id] "F-123456"}
     ;; here the context will be {"order" {"client" "XYZ Corp" "item-count" 10 "id" "F-123456"}}
     (c/info "Order processed successfully")))
+;; Logging API in the 'nested' namespace accepts nested MDC
+(n/info {:order {:event-id "foo"}} "Foo happened")
 ```
-
-
-## API Documentation
-
-http://kumarshantanu.github.io/projects/cambium/
 
 
 ## License

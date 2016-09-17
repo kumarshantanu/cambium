@@ -6,7 +6,7 @@
 No TODO!
 
 
-## 0.6.0 / 2016-September-??
+## 0.6.0 / 2016-September-18
 
 * [BREAKING CHANGE] Move nested-context API from namespace `cambium.core` to `cambium.nested`
   * Drop `cambium.core/merge-nested-context!` (moved to `cambium.nested/merge-logging-context!`)
