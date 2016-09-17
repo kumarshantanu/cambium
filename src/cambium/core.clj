@@ -52,7 +52,7 @@
                        (.append sb v)
                        (.toString sb)))]
       (cond
-        (string? v)  v
+        (string? v)  v  ; do not follow escape-safety due to performance
         (instance?
           clojure.lang.Named v) (name v)
         (integer? v) (hint-str "^long "    v)
