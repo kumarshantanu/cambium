@@ -18,7 +18,6 @@ No TODO!
   * `wrap-logging-context`
   * `context-val`
   * `log`, `trace`, `debug`, `info`, `warn`, `error`, `fatal`
-* [TODO] Make `cambium.core/encode-val` and `cambium.core/decode-val` safe for string
 
 
 ## 0.5.0 / 2016-September-07
