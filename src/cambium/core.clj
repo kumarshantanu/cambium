@@ -94,87 +94,11 @@
 
 
 (defn context-val
-  "Return the value of the specified key (or keypath in nested structure) from the current context; behavior for
-  non-existent keys would be implementation dependent - it may return nil or may throw exception.
-  Note: For keypath lookup in nested context 'cambium.core/stringify-val' and 'cambium.core/destringify-val' must be
-        redefined to preserve structure.
-  See:  cambium.core/encode-val, cambium.core/decode-val"
+  "Return the value of the specified key from the current context; behavior for non-existent keys would be
+  implementation dependent - it may return nil or may throw exception.
+  See: cambium.core/encode-val, cambium.core/decode-val"
   [k]
-  (let [mdc-val #(destringify-val (MDC/get (stringify-key %)))]
-    (if (coll? k)
-      (get-in (mdc-val (first k)) (map stringify-key (next k)))
-      (mdc-val k))))
-
-
-(defn merge-nested-context!
-  "Merge given 'potentially-nested' context map into the current MDC using the following constraints:
-  * Entries with nil key or nil value are ignored
-  * Collection keys are treated as key-path (all tokens in a key path are turned into string)
-  * Keys are converted to string
-  * When absent-k (second argument) is specified, context is set only if the key/path is absent
-  Note: For nested context 'cambium.core/stringify-val' and 'cambium.core/destringify-val' must be redefined to
-        preserve structure.
-  See:  cambium.core/encode-val, cambium.core/decode-val"
-  ([context]
-    (let [^HashMap delta (HashMap. (count context))]
-      ;; build up a delta with top-level stringified keys and original vals
-      (doseq [pair (seq context)]
-        (let [k (first pair)
-              v (second pair)]
-          (when-not (or (nil? k) (nil? v))
-            (if (coll? k)
-              (when (and (seq k) (every? #(not (nil? %)) k))
-                (let [k-path (map stringify-key k)
-                      k-head (first k-path)]
-                  (.put delta k-head (-> (get delta k-head)
-                                       (or (when-let [oldval (MDC/get k-head)]
-                                             (let [oldmap (destringify-val oldval)]
-                                               (if (map? oldmap) oldmap {}))))
-                                       (assoc-in (next k-path) (i/stringify-nested-keys stringify-key v))))))
-              (.put delta (stringify-key k) (i/stringify-nested-keys stringify-key v))))))
-      ;; set the pairs from delta into the MDC
-      (doseq [^Map$Entry pair (.entrySet delta)]
-        (let [str-k (.getKey pair)
-              v     (.getValue pair)]
-          (MDC/put str-k (stringify-val v))))))
-  ([context absent-k]
-    (when-not (context-val absent-k)
-      (merge-nested-context! context))))
-
-
-(defmacro with-nested-context
-  "Given 'potentially-nested' context map data, merge it into the current MDC and evaluate the body of code in that
-  context. Restore original context in the end.
-  Note: For nested context 'cambium.core/stringify-val' and 'cambium.core/destringify-val' must be redefined to
-        preserve structure.
-  See:  cambium.core/encode-val, cambium.core/decode-val, cambium.core/merge-nested-context!, cambium.mdc/with-raw-mdc
-        http://logback.qos.ch/manual/mdc.html"
-  [context & body]
-  `(m/preserving-mdc
-     (merge-nested-context! ~context)
-     ~@body))
-
-
-(defn wrap-nested-context
-  "Wrap function f with the specified 'potentially nested' context map.
-  Note: For nested context 'cambium.core/stringify-val' and 'cambium.core/destringify-val' must be redefined to
-        preserve structure.
-  See:  cambium.core/encode-val, cambium.core/decode-val, cambium.mdc/wrap-raw-mdc
-        http://logback.qos.ch/manual/mdc.html"
-  [context f]
-  (fn
-    ([]
-      (with-nested-context context
-        (f)))
-    ([x]
-      (with-nested-context context
-        (f x)))
-    ([x y]
-      (with-nested-context context
-        (f x y)))
-    ([x y & args]
-      (with-nested-context context
-        (apply f x y args)))))
+  (destringify-val (MDC/get (stringify-key k))))
 
 
 (defn merge-logging-context!

@@ -8,7 +8,7 @@ No TODO!
 
 ## 0.6.0 / 2016-September-??
 
-* [TODO]-[BREAKING CHANGE] Move nested-context API to `cambium.nested` namespace
+* [BREAKING CHANGE] Move nested-context API from namespace `cambium.core` to `cambium.nested`
   * Drop `cambium.core/merge-nested-context!` (moved to `cambium.nested/merge-logging-context!`)
   * Drop `cambium.core/with-nested-context` (moved to `cambium.nested/with-logging-context`)
   * Now `cambium.core/context-val` no more treats a collection as a nested path
