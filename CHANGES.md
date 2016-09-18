@@ -3,7 +3,9 @@
 
 ## TODO
 
-No TODO!
+* [TODO] Make nested-MDC-aware version of `cambium.core/deflogger`
+  * [TODO] Or drop support for MDC argument in `deflogger` altogether
+* [TODO] Extend `deflogger` to optionally pre-declare the log message
 
 
 ## 0.6.0 / 2016-September-18
