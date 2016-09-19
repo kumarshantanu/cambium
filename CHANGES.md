@@ -8,6 +8,11 @@
 * [TODO] Extend `deflogger` to optionally pre-declare the log message
 
 
+## [WIP] 0.6.1 / 2016-September-19
+
+* [TODO] Add `deflogger` to the `cambium.nested` namespace with nested MDC support.
+
+
 ## 0.6.0 / 2016-September-18
 
 * [BREAKING CHANGE] Move nested-context API from namespace `cambium.core` to `cambium.nested`
