@@ -9,10 +9,17 @@
 
 (ns cambium.test-util
   (:require
-    [cambium.core :refer :all]))
+    [cambium.core :as c]
+    [cambium.core :as n]))
 
 
-(deflogger metrics "METRICS")
+(c/deflogger metrics "METRICS")
 
 
-(deflogger txn-metrics "TXN-METRICS" :info :fatal)
+(c/deflogger txn-metrics "TXN-METRICS" :info :fatal)
+
+
+(n/deflogger n-metrics "METRICS")
+
+
+(n/deflogger n-txn-metrics "TXN-METRICS" :info :fatal)

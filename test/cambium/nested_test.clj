@@ -26,9 +26,9 @@
       (n/info {:foo "bar"} "hello with wrapped context"))
     (n/error {} (ex-info "some error" {:data :foo}) "internal error"))
   (testing "custom loggers"
-    (tu/metrics {:latency-ns 430 :module "registration"} "op.latency")
-    (tu/metrics {:module "registration"} (ex-info "some error" {:data :foo}) "internal error")
-    (tu/txn-metrics {:module "order-fetch"} "Fetched order #4568"))
+    (tu/n-metrics {:latency-ns 430 :module "registration"} "op.latency")
+    (tu/n-metrics {[:app :module] "registration"} (ex-info "some error" {:data :foo}) "internal error")
+    (tu/n-txn-metrics {:module "order-fetch"} "Fetched order #4568"))
   (testing "type-safe encoding"
     (let [sk c/stringify-key]
       (with-redefs [c/stringify-key (fn ^String [x] (.replace ^String (sk x) \- \_))

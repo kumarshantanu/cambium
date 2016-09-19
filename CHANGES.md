@@ -10,7 +10,7 @@
 
 ## [WIP] 0.6.1 / 2016-September-19
 
-* [TODO] Add `deflogger` to the `cambium.nested` namespace with nested MDC support.
+* Add missing `deflogger` to the `cambium.nested` namespace with nested MDC support
 
 
 ## 0.6.0 / 2016-September-18

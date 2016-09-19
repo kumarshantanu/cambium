@@ -136,3 +136,36 @@
 (deflevel warn)
 (deflevel error)
 (deflevel fatal)
+
+
+;; ----- making custom logger -----
+
+
+(defmacro deflogger
+  "Define a custom logger with spcified logger name. You may optionally specify normal (:info by default) and error
+  (:error by default) log levels."
+  ([logger-sym logger-name]
+    `(deflogger ~logger-sym ~logger-name :info :error))
+  ([logger-sym logger-name log-level error-log-level]
+    (when-not (symbol? logger-sym)
+      (throw (IllegalArgumentException. (str "Expected a symbol for logger var name, found " (pr-str logger-sym)))))
+    (when-not (string? logger-name)
+      (throw (IllegalArgumentException. (str "Expected a string logger name, found " (pr-str logger-name)))))
+    (when-not (#{:trace :debug :info :warn :error :fatal} log-level)
+      (throw (IllegalArgumentException.
+               (str "Expected log-level :trace, :debug, :info, :warn, :error or :fatal, found " (pr-str log-level)))))
+    (when-not (#{:trace :debug :info :warn :error :fatal} error-log-level)
+      (throw
+        (IllegalArgumentException.
+          (str "Expected error-log-level :trace, :debug, :info, :warn, :error or :fatal, found " (pr-str log-level)))))
+    (let [docstring (str logger-name " logger.")
+          arglists  ''([msg] [mdc msg] [mdc throwable msg])]
+      `(defmacro ~logger-sym
+         ~docstring
+         {:arglists ~arglists}
+         ([msg#]                 `(log (ctl-impl/get-logger ctl/*logger-factory* ~~logger-name)
+                                    ~~log-level ~msg#))
+         ([mdc# msg#]            `(log (ctl-impl/get-logger ctl/*logger-factory* ~~logger-name)
+                                    ~~log-level ~mdc# nil ~msg#))
+         ([mdc# throwable# msg#] `(log (ctl-impl/get-logger ctl/*logger-factory* ~~logger-name)
+                                    ~~error-log-level ~mdc# ~throwable# ~msg#))))))
