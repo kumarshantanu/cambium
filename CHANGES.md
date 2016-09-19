@@ -8,7 +8,7 @@
 * [TODO] Extend `deflogger` to optionally pre-declare the log message
 
 
-## [WIP] 0.6.1 / 2016-September-19
+## 0.6.1 / 2016-September-19
 
 * Add missing `deflogger` to the `cambium.nested` namespace with nested MDC support
 
