@@ -1,4 +1,4 @@
-(defproject cambium "0.6.1"
+(defproject cambium "0.7.0-SNAPSHOT"
   :description "Clojure wrapper for SLF4j with MDC and clojure/tools.logging"
   :url "https://github.com/kumarshantanu/cambium"
   :license {:name "Eclipse Public License"
@@ -21,7 +21,7 @@
                    :global-vars  {*unchecked-math* :warn-on-boxed}}
              :c18 {:dependencies [[org.clojure/clojure "1.8.0"]]
                    :global-vars  {*unchecked-math* :warn-on-boxed}}
-             :c19 {:dependencies [[org.clojure/clojure "1.9.0-alpha12"]]
+             :c19 {:dependencies [[org.clojure/clojure "1.9.0-alpha13"]]
                    :global-vars  {*unchecked-math* :warn-on-boxed}}
              :dln {:jvm-opts ["-Dclojure.compiler.direct-linking=true"]}}
   :plugins [[lein-codox "0.10.0"]]

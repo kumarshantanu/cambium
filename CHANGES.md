@@ -3,9 +3,16 @@
 
 ## TODO
 
+None
+
+
+## 0.7.0 / 2016-September-??
+
 * [TODO] Make `cambium.core/merge-logging-context!` overridable with a nesting-aware version
 * [TODO] Make `cambium.core/context-val` overridable with a nesting-aware version
 * [TODO] Drop the `cambium.nested` namespace altogether
+* [TODO] Validate arguments of logging calls (literals only)
+* [TODO] Consider `null` MDC attribute value as a deletion request and remove it when merging
 
 
 ## 0.6.1 / 2016-September-19
