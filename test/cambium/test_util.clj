@@ -17,9 +17,3 @@
 
 
 (c/deflogger txn-metrics "TXN-METRICS" :info :fatal)
-
-
-(n/deflogger n-metrics "METRICS")
-
-
-(n/deflogger n-txn-metrics "TXN-METRICS" :info :fatal)
