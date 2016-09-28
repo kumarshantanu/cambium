@@ -119,6 +119,8 @@
     `(when (ctl-impl/enabled? ~logger ~level)
        (ctl-impl/write! ~logger ~level nil ~msg)))
   ([logger level mdc throwable msg]
+    (i/expected i/mdc-literal? "context (MDC) map" mdc)
+    (i/expected i/throwable-literal? "exception object" throwable)
     `(when (ctl-impl/enabled? ~logger ~level)
        (with-logging-context ~mdc
          (ctl-impl/write! ~logger ~level ~throwable ~msg)))))

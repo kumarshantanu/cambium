@@ -12,7 +12,7 @@ None
 * Make `cambium.core/context-val` overridable (likely with a nesting-aware version)
 * [BREAKING CHANGE] Remove parallel `cambium.core` API from `cambium.nested` namespace
 * [BREAKING CHANGE] Move nesting-aware, add-on functionality to the `cambium.nested` namespace
-* [TODO] Validate arguments of logging calls (literals only)
+* Validate arguments of logging calls for invalid literal types
 * Consider `nil` MDC attribute value as a deletion request; remove from MDC while merging
 
 

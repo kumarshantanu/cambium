@@ -23,6 +23,34 @@
       (expected expectation found))))
 
 
+(defn scalar-literal?
+  "Return true if argument is a program literal, false otherwise."
+  [x]
+  (or (string? x)
+    (instance? Boolean x)
+    (number? x)
+    (keyword? x)
+    (vector? x)
+    (set? x)))
+
+
+(defn mdc-literal?
+  "Return true if potential MDC literal/expression, false otherwise."
+  [x]
+  (and (not (scalar-literal? x))
+    (not (vector? x))
+    (not (set? x))))
+
+
+(defn throwable-literal?
+  "Return true if potential throwable exception literal/expression, false otherwise."
+  [x]
+  (and (not (scalar-literal? x))
+    (not (vector? x))
+    (not (set? x))
+    (not (map? x))))
+
+
 (defmacro strcat
   "Stripped down impl of Stringer/strcat: https://github.com/kumarshantanu/stringer"
   ([]
