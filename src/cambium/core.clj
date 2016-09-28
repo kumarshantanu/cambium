@@ -56,17 +56,20 @@
 
 (defn ^:redef merge-logging-context!
   "Merge given context map into the current MDC using the following constraints:
-  * Nil keys and values are ignored
+  * Nil keys are ignored
+  * Nil values are considered as deletion-request for corresponding keys
   * Keys are converted to string
   * When absent-k (second argument) is specified, context is set only if the key is absent
   * Keys in the current context continue to have old values unless they are overridden by the specified context map
-  * Keys in the context map may not be nested (for nesting support consider 'cambium.core/merge-nested-context!')"
+  * Keys in the context map may not be nested (for nesting support consider 'cambium.nested/merge-nested-context!')"
   ([context]
     (doseq [pair (seq context)]
       (let [k (first pair)
             v (second pair)]
-        (when-not (or (nil? k) (nil? v))
-          (MDC/put (stringify-key k) (stringify-val v))))))
+        (when-not (nil? k)
+          (if (nil? v)  ; consider nil values as deletion request
+            (MDC/remove (stringify-key k))
+            (MDC/put (stringify-key k) (stringify-val v)))))))
   ([context absent-k]
     (when-not (MDC/get (stringify-key absent-k))
       (merge-logging-context! context))))
@@ -74,11 +77,8 @@
 
 (defmacro with-logging-context
   "Given context map data, merge it into the current MDC and evaluate the body of code in that context. Restore
-  original context in the end. Following constraints are applied:
-  * Nil keys and values are ignored
-  * Keys may not be nested (for nesting support consider 'cambium.core/with-nested-context')
-  * Values are not inspected for nested structures
-  See: cambium.core/merge-logging-context!, cambium.core/with-nested-context, cambium.mdc/with-raw-mdc
+  original context in the end.
+  See: cambium.core/merge-logging-context!, cambium.mdc/with-raw-mdc
        http://logback.qos.ch/manual/mdc.html"
   [context & body]
   `(m/preserving-mdc
@@ -87,8 +87,8 @@
 
 
 (defn wrap-logging-context
-  "Wrap function f with the specified logging context. For nested context consider 'cambium.core/wrap-nested-context'.
-  See: cambium.core/with-logging-context, cambium.core/wrap-nested-context, cambium.mdc/wrap-raw-mdc
+  "Wrap function f with the specified logging context.
+  See: cambium.core/with-logging-context, cambium.mdc/wrap-raw-mdc
        http://logback.qos.ch/manual/mdc.html"
   [context f]
   (fn

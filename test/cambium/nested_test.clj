@@ -76,7 +76,9 @@
 
 
 (deftest test-context-propagation
-  (with-redefs [c/context-val n/nested-context-val
+  (with-redefs [c/stringify-val n/encode-val
+                c/destringify-val n/decode-val
+                c/context-val n/nested-context-val
                 c/merge-logging-context! n/merge-nested-context!]
     (let [context-old {:foo :bar
                       :baz :quux}
@@ -97,7 +99,7 @@
        (c/with-logging-context context-old
          (f)
          (c/with-logging-context context-new
-           (is (= "10" (c/context-val :foo)))
+           (is (= 10 (c/context-val :foo)))
            (is (= "quux" (c/context-val :baz)) "Delta context override must not remove non-overridden attributes")
            (is (= "baz" (c/context-val :bar))))
          (with-redefs [c/stringify-val   n/encode-val
@@ -120,10 +122,21 @@
        (c/with-logging-context context-old
          (f)
          (c/with-logging-context context-new
-           (is (= "10" (c/context-val :foo)))
+           (is (= 10 (c/context-val :foo)))
            (is (= "quux" (c/context-val :baz)) "Delta context override must not remove non-overridden attributes")
            (is (= "baz" (c/context-val :bar)))))
        (is (nil? (c/context-val :foo)) "Attribute not set must be absent after restoration"))
+     (testing "deletion via nil values"
+       (c/with-logging-context context-old
+         (c/with-logging-context {:foo nil}
+           (is (not (contains? (c/get-context) (c/stringify-key :foo))))))
+       (c/with-logging-context {:foo {:bar {:baz 10}}}
+         (c/with-logging-context {[:foo :bar :baz] nil}
+           (is (= {(c/stringify-key :bar) {}} (c/context-val :foo))))
+         (c/with-logging-context {[:foo :bar] nil}
+           (is (= {} (c/context-val :foo))))
+         (c/with-logging-context {[:foo] nil}
+           (is (not (contains? (c/get-context) (c/stringify-key :foo)))))))
      (testing "wrap-raw-mdc"
        (is (nil? (c/context-val :foo)))
        ((c/wrap-logging-context context-old f))

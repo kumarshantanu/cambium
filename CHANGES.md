@@ -13,7 +13,7 @@ None
 * [BREAKING CHANGE] Remove parallel `cambium.core` API from `cambium.nested` namespace
 * [BREAKING CHANGE] Move nesting-aware, add-on functionality to the `cambium.nested` namespace
 * [TODO] Validate arguments of logging calls (literals only)
-* [TODO] Consider `null` MDC attribute value as a deletion request and remove it when merging
+* Consider `nil` MDC attribute value as a deletion request; remove from MDC while merging
 
 
 ## 0.6.1 / 2016-September-19

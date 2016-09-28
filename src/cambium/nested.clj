@@ -21,7 +21,7 @@
     [cambium.internal :as i]
     [cambium.mdc      :as m])
   (:import
-    [java.util HashMap Map$Entry]
+    [java.util ArrayList HashMap Map$Entry]
     [org.slf4j MDC]))
 
 
@@ -83,32 +83,47 @@
 
 (defn merge-nested-context!
   "Merge given 'potentially-nested' context map into the current MDC using the following constraints:
-  * Entries with nil key or nil value are ignored
+  * Entries with nil key are ignored
+  * Nil values are considered as deletion-request for corresponding keys
   * Collection keys are treated as key-path (all tokens in a key path are turned into string)
   * Keys are converted to string
   * When absent-k (second argument) is specified, context is set only if the key/path is absent"
   ([context]
-    (let [^HashMap delta (HashMap. (count context))]
+    (let [^HashMap delta (HashMap. (count context))
+          deleted-keys   (ArrayList.)
+          remove-key     (fn [^String str-k] (.remove delta str-k) (.add deleted-keys str-k))]
       ;; build up a delta with top-level stringified keys and original vals
       (doseq [pair (seq context)]
         (let [k (first pair)
               v (second pair)]
-          (when-not (or (nil? k) (nil? v))
+          (when-not (nil? k)
             (if (coll? k)
               (when (and (seq k) (every? #(not (nil? %)) k))
                 (let [k-path (map c/stringify-key k)
-                      k-head (first k-path)]
-                  (.put delta k-head (-> (get delta k-head)
-                                       (or (when-let [oldval (MDC/get k-head)]
-                                             (let [oldmap (c/destringify-val oldval)]
-                                               (if (map? oldmap) oldmap {}))))
-                                       (assoc-in (next k-path) (i/stringify-nested-keys c/stringify-key v))))))
-              (.put delta (c/stringify-key k) (i/stringify-nested-keys c/stringify-key v))))))
+                      k-head (first k-path)
+                      k-next (next k-path)]
+                  (if (and (nil? v) (not k-next))  ; consider nil values as deletion request
+                    (remove-key k-head)
+                    (.put delta k-head (let [value-map (or (get delta k-head)
+                                                         (when-let [oldval (MDC/get k-head)]
+                                                           (let [oldmap (c/destringify-val oldval)]
+                                                             (if (map? oldmap) oldmap {}))))]
+                                         (if (nil? v)  ; consider nil values as deletion request
+                                           (if (next k-next)
+                                             (update-in value-map (butlast k-next) dissoc (last k-next))
+                                             (dissoc value-map (first k-next)))
+                                           (assoc-in value-map k-next (i/stringify-nested-keys c/stringify-key v))))))))
+              (if (nil? v)  ; consider nil values as deletion request
+                (remove-key (c/stringify-key k))
+                (.put delta (c/stringify-key k) (i/stringify-nested-keys c/stringify-key v)))))))
       ;; set the pairs from delta into the MDC
       (doseq [^Map$Entry pair (.entrySet delta)]
         (let [str-k (.getKey pair)
               v     (.getValue pair)]
-          (MDC/put str-k (c/stringify-val v))))))
+          (MDC/put str-k (c/stringify-val v))))
+      ;; remove keys identified for deletion
+      (doseq [^String str-k deleted-keys]
+        (MDC/remove str-k))))
   ([context absent-k]
     (when-not (nested-context-val absent-k)
       (merge-nested-context! context))))
