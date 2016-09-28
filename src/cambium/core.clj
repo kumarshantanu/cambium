@@ -171,11 +171,19 @@
          (ctl-impl/write! ~logger ~level ~throwable ~msg)))))
 
 
+(def level-keys
+  #{:trace :debug :info :warn :error :fatal})
+
+
+(def level-syms
+  "Symbols levels"
+  '#{trace debug info warn error fatal})
+
+
 (defmacro ^:private deflevel
   "This macro is used internally to only define normal namespace-based level loggers."
   [level-sym]
-  (when-not (symbol? level-sym)
-    (throw (IllegalArgumentException. (str "Expected a symbol for level name, found " (pr-str level-sym)))))
+  (i/expected level-syms (str "a symbol for level name " level-syms) level-sym)
   (let [level-key (keyword level-sym)
         level-doc (str "Similar to clojure.tools.logging/" level-sym ".")
         arglists  ''([msg] [mdc msg] [mdc throwable msg])]
@@ -204,17 +212,10 @@
   ([logger-sym logger-name]
     `(deflogger ~logger-sym ~logger-name :info :error))
   ([logger-sym logger-name log-level error-log-level]
-    (when-not (symbol? logger-sym)
-      (throw (IllegalArgumentException. (str "Expected a symbol for logger var name, found " (pr-str logger-sym)))))
-    (when-not (string? logger-name)
-      (throw (IllegalArgumentException. (str "Expected a string logger name, found " (pr-str logger-name)))))
-    (when-not (#{:trace :debug :info :warn :error :fatal} log-level)
-      (throw (IllegalArgumentException.
-               (str "Expected log-level :trace, :debug, :info, :warn, :error or :fatal, found " (pr-str log-level)))))
-    (when-not (#{:trace :debug :info :warn :error :fatal} error-log-level)
-      (throw
-        (IllegalArgumentException.
-          (str "Expected error-log-level :trace, :debug, :info, :warn, :error or :fatal, found " (pr-str log-level)))))
+    (i/expected symbol? "a symbol for logger var name" logger-sym)
+    (i/expected string? "a string logger name" logger-name)
+    (i/expected level-keys (str "log-level keyword " level-keys) log-level)
+    (i/expected level-keys (str "error-log-level keyword " level-keys) error-log-level)
     (let [docstring (str logger-name " logger.")
           arglists  ''([msg] [mdc msg] [mdc throwable msg])]
       `(defmacro ~logger-sym

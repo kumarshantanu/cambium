@@ -13,6 +13,16 @@
     [clojure.tools.logging.impl :as ctl-impl]))
 
 
+(defn expected
+  "Throw IllegalArgumentException indicating what was expected and what was found instead."
+  ([expectation found]
+    (throw (IllegalArgumentException.
+             (format "Expected %s, but found (%s) %s" expectation (class found) (pr-str found)))))
+  ([pred expectation found]
+    (when-not (pred found)
+      (expected expectation found))))
+
+
 (defmacro strcat
   "Stripped down impl of Stringer/strcat: https://github.com/kumarshantanu/stringer"
   ([]
