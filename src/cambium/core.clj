@@ -93,7 +93,7 @@
     (zipmap ks (map #(destringify-val (get cm %)) ks))))
 
 
-(defn context-val
+(defn ^:redef context-val
   "Return the value of the specified key from the current context; behavior for non-existent keys would be
   implementation dependent - it may return nil or may throw exception.
   See: cambium.core/encode-val, cambium.core/decode-val"
@@ -101,7 +101,7 @@
   (destringify-val (MDC/get (stringify-key k))))
 
 
-(defn merge-logging-context!
+(defn ^:redef merge-logging-context!
   "Merge given context map into the current MDC using the following constraints:
   * Nil keys and values are ignored
   * Keys are converted to string
