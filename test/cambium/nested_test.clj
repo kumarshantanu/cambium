@@ -15,6 +15,35 @@
     [cambium.test-util :as tu]))
 
 
+(deftest type-safe-encoding
+  (testing "type-safe encoding"
+    (let [sk c/stringify-key]
+      (with-redefs [c/stringify-key (fn ^String [x] (.replace ^String (sk x) \- \_))
+                    c/stringify-val n/encode-val
+                    c/destringify-val n/decode-val]
+        (c/info "hello")
+        (c/info {:foo-k "bar" :baz 10 :qux true} "hello with context")
+        (c/with-logging-context {:extra-k "context" "some-data" [1 2 :three 'four]}
+          (is (= (c/get-context) {"extra_k" "context" "some_data" [1 2 :three 'four]}))
+          (is (= (c/context-val :extra-k) "context"))
+          (is (nil? (c/context-val "foo")))
+          (c/info {:foo "bar"} "hello with wrapped context"))
+        (c/error {} (ex-info "some error" {:data :foo}) "internal error")))))
+
+
+(deftest test-codec
+  (let [payload (n/encode-val :foo)]  (is (= "foo" payload))           (is (= "foo" (n/decode-val payload))))
+  (let [payload (n/encode-val 'foo)]  (is (= "foo" payload))           (is (= "foo" (n/decode-val payload))))
+  (let [payload (n/encode-val "foo")] (is (= "foo" payload))           (is (= "foo" (n/decode-val payload))))
+  (let [payload (n/encode-val 10)]    (is (= "^long 10" payload))      (is (= 10    (n/decode-val payload))))
+  (let [payload (n/encode-val 1.2)]   (is (= "^double 1.2" payload))   (is (= 1.2   (n/decode-val payload))))
+  (let [payload (n/encode-val true)]  (is (= "^boolean true" payload)) (is (= true  (n/decode-val payload))))
+  (let [payload (n/encode-val nil)]   (is (= "^object nil" payload))   (is (= nil   (n/decode-val payload))))
+  (let [payload (n/encode-val
+                  [1 :two 'four])]    (is (= "^object [1 :two four]"
+                                            payload))                  (is (= [1 :two 'four] (n/decode-val payload)))))
+
+
 (deftest log-test
   (with-redefs [c/context-val n/nested-context-val
                 c/merge-logging-context! n/merge-nested-context!]
@@ -34,8 +63,8 @@
     (testing "type-safe encoding"
       (let [sk c/stringify-key]
         (with-redefs [c/stringify-key (fn ^String [x] (.replace ^String (sk x) \- \_))
-                      c/stringify-val c/encode-val
-                      c/destringify-val c/decode-val]
+                      c/stringify-val n/encode-val
+                      c/destringify-val n/decode-val]
           (c/info "hello")
           (c/info {:foo-k "bar" :baz 10 :qux true} "hello with context")
           (c/with-logging-context {:extra-k "context" "some-data" [1 2 :three 'four]}
@@ -71,8 +100,8 @@
            (is (= "10" (c/context-val :foo)))
            (is (= "quux" (c/context-val :baz)) "Delta context override must not remove non-overridden attributes")
            (is (= "baz" (c/context-val :bar))))
-         (with-redefs [cambium.core/stringify-val   cambium.core/encode-val
-                       cambium.core/destringify-val cambium.core/decode-val]
+         (with-redefs [c/stringify-val   n/encode-val
+                       c/destringify-val n/decode-val]
            (c/with-logging-context nested-diff
              (is (= {"learn-to-fly" {"title" "learn to fly"
                                      "year" 1999}
