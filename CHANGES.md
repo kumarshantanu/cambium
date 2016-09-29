@@ -6,7 +6,7 @@
 None
 
 
-## 0.7.0 / 2016-September-??
+## 0.7.0 / 2016-September-29
 
 * Make `cambium.core/merge-logging-context!` overridable (likely with a nesting-aware version)
 * Make `cambium.core/context-val` overridable (likely with a nesting-aware version)

@@ -6,7 +6,7 @@ Clojure wrapper for [SLF4j](http://www.slf4j.org/) with
 
 ## Usage
 
-Leiningen coordinates: `[cambium "0.6.1"]`
+Leiningen coordinates: `[cambium "0.7.0"]`
 
 _Note: Cambium only wraps over SLF4j. You also need a suitable SLF4j implementation, such as
 [logback-bundle](https://github.com/kumarshantanu/logback-bundle) as your project dependency._
@@ -16,7 +16,6 @@ Require the namespace:
 ```clojure
 (require '[cambium.core :as c])
 (require '[cambium.mdc  :as m])
-(require '[cambium.nested :as n])
 ```
 
 
@@ -88,24 +87,36 @@ Context values sometimes may be nested and need manipulation. Cambium requires f
 ahead of using nested context:
 
 ```clojure
-(alter-var-root #'cambium.core/stringify-val   (constantly cambium.core/encode-val)
-(alter-var-root #'cambium.core/destringify-val (constantly cambium.core/decode-val)
+(alter-var-root #'cambium.core/stringify-val   (constantly cambium.nested/encode-val)
+(alter-var-root #'cambium.core/destringify-val (constantly cambium.nested/decode-val)
 ```
 
-Also, for first-class handling of nested context, Cambium converts all tokens in a key path as string tokens. See
-nesting example below:
+If you are logging via JSON, you may want to override Cambium fns with the JSON converter functions.
+
+#### Nested context navigation
+
+For first-class handling of nested context, Cambium can convert all tokens in a key path as string tokens. This
+requires special configuration as follows:
 
 ```clojure
-(n/with-logging-context {:order {:client "XYZ Corp"
+(alter-var-root #'cambium.core/stringify-val          (constantly cambium.nested/encode-val)
+(alter-var-root #'cambium.core/destringify-val        (constantly cambium.nested/decode-val)
+(alter-var-root #'cambium.core/context-val            (constantly cambium.nested/nested-context-val)
+(alter-var-root #'cambium.core/merge-logging-context! (constantly cambium.nested/merge-nested-context!)
+```
+
+Now see nesting-navigation example below:
+
+```clojure
+(c/with-logging-context {:order {:client "XYZ Corp"
                                  :item-count 10}}
   ;; ..other processing..
-  (n/with-logging-context {[:order :id] "F-123456"}
+  (c/with-logging-context {[:order :id] "F-123456"}
     ;; here the context will be {"order" {"client" "XYZ Corp" "item-count" 10 "id" "F-123456"}}
     (c/info "Order processed successfully")))
 ;; Logging API in the 'nested' namespace accepts nested MDC
-(n/info {:order {:event-id "foo"}} "Foo happened")
+(c/info {:order {:event-id "foo"}} "Foo happened")
 ```
-
 
 ## License
 
