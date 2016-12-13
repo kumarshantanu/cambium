@@ -3,7 +3,9 @@
 
 ## TODO
 
-None
+* [TODO] Add support for merging context independent of the current MDC
+  * [TODO] Vanilla context
+  * [TODO] Nested context
 
 
 ## 0.7.0 / 2016-September-29
