@@ -12,7 +12,8 @@
     [clojure.tools.logging      :as ctl]
     [clojure.tools.logging.impl :as ctl-impl]
     [cambium.internal           :as i]
-    [cambium.mdc                :as m])
+    [cambium.mdc                :as m]
+    [cambium.type               :as t])
   (:import
     [java.util HashMap Map$Entry]
     [org.slf4j MDC]))
@@ -34,6 +35,21 @@
 (def ^:redef destringify-val
   "Arity-1 fn to convert MDC string back to original value. By default this simply returns the stored String value."
   identity)
+
+
+;; ----- MDC read/write -----
+
+
+(extend-protocol t/IMutableContext
+  HashMap
+  (put!    [this k v] (.put this (stringify-key k) (stringify-val v)))
+  (remove! [this k]   (.remove this (stringify-key k))))
+
+
+(def mutable-mdc-context
+  (reify t/IMutableContext
+    (put!    [_ k v] (MDC/put (stringify-key k) (stringify-val v)))
+    (remove! [_ k]   (MDC/remove (stringify-key k)))))
 
 
 ;; ----- MDC handling -----

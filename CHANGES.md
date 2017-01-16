@@ -8,7 +8,7 @@ None
 
 ## 0.8.0 / 2017-January-??
 
-* [TODO] Add abstract type for mutable context updates
+* Add abstract type for mutable context updates
 * [TODO - BREAKING CHANGE] Drop API for conditional update of logging context
 * [TODO] Add support for merging context independent of the current MDC
   * [TODO] Vanilla context
