@@ -11,9 +11,6 @@ None
 * Add abstract type for mutable context updates
 * [BREAKING CHANGE] Drop API for conditional update of logging context
 * Add arity to fns dealing with context to work with custom destination
-* [TODO] Add support for merging context independent of the current MDC
-  * [TODO] Vanilla context
-  * [TODO] Nested context
 
 
 ## 0.7.0 / 2016-September-29
