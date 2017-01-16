@@ -11,5 +11,6 @@
 
 
 (defprotocol IMutableContext
+  (get-val [this k])
   (put!    [this k v])
   (remove! [this k]))

@@ -42,12 +42,14 @@
 
 (extend-protocol t/IMutableContext
   HashMap
+  (get-val [this k]   (.get this (stringify-key k)))
   (put!    [this k v] (.put this (stringify-key k) (stringify-val v)))
   (remove! [this k]   (.remove this (stringify-key k))))
 
 
-(def mutable-mdc-context
+(def current-mdc-context
   (reify t/IMutableContext
+    (get-val [_ k]   (MDC/get (stringify-key k)))
     (put!    [_ k v] (MDC/put (stringify-key k) (stringify-val v)))
     (remove! [_ k]   (MDC/remove (stringify-key k)))))
 
@@ -66,8 +68,10 @@
 (defn ^:redef context-val
   "Return the value of the specified key from the current context; behavior for non-existent keys would be
   implementation dependent - it may return nil or may throw exception."
-  [k]
-  (destringify-val (MDC/get (stringify-key k))))
+  ([k]
+    (context-val current-mdc-context k))
+  ([repo k]
+    (destringify-val (t/get-val repo (stringify-key k)))))
 
 
 (defn ^:redef merge-logging-context!
@@ -75,20 +79,18 @@
   * Nil keys are ignored
   * Nil values are considered as deletion-request for corresponding keys
   * Keys are converted to string
-  * When absent-k (second argument) is specified, context is set only if the key is absent
   * Keys in the current context continue to have old values unless they are overridden by the specified context map
   * Keys in the context map may not be nested (for nesting support consider 'cambium.nested/merge-nested-context!')"
   ([context]
+    (merge-logging-context! current-mdc-context context))
+  ([dest context]
     (doseq [pair (seq context)]
       (let [k (first pair)
             v (second pair)]
         (when-not (nil? k)
           (if (nil? v)  ; consider nil values as deletion request
-            (MDC/remove (stringify-key k))
-            (MDC/put (stringify-key k) (stringify-val v)))))))
-  ([context absent-k]
-    (when-not (MDC/get (stringify-key absent-k))
-      (merge-logging-context! context))))
+            (t/remove! dest (stringify-key k))
+            (t/put! dest (stringify-key k) (stringify-val v))))))))
 
 
 (defmacro with-logging-context

@@ -19,10 +19,10 @@
     [clojure.tools.logging.impl :as ctl-impl]
     [cambium.core     :as c]
     [cambium.internal :as i]
-    [cambium.mdc      :as m])
+    [cambium.mdc      :as m]
+    [cambium.type     :as t])
   (:import
-    [java.util ArrayList HashMap Map$Entry]
-    [org.slf4j MDC]))
+    [java.util ArrayList HashMap Map$Entry]))
 
 
 ;; ----- Codec (default: EDN codec) helper -----
@@ -74,11 +74,13 @@
 (defn nested-context-val
   "Return the value of the specified key (or keypath in nested structure) from the current context; behavior for
   non-existent keys would be implementation dependent - it may return nil or may throw exception."
-  [k]
-  (let [mdc-val #(c/destringify-val (MDC/get (c/stringify-key %)))]
-    (if (coll? k)
-      (get-in (mdc-val (first k)) (map c/stringify-key (next k)))
-      (mdc-val k))))
+  ([k]
+    (nested-context-val c/current-mdc-context k))
+  ([repo k]
+    (let [mdc-val #(c/destringify-val (t/get-val repo (c/stringify-key %)))]
+      (if (coll? k)
+        (get-in (mdc-val (first k)) (map c/stringify-key (next k)))
+        (mdc-val k)))))
 
 
 (defn merge-nested-context!
@@ -86,9 +88,10 @@
   * Entries with nil key are ignored
   * Nil values are considered as deletion-request for corresponding keys
   * Collection keys are treated as key-path (all tokens in a key path are turned into string)
-  * Keys are converted to string
-  * When absent-k (second argument) is specified, context is set only if the key/path is absent"
+  * Keys are converted to string"
   ([context]
+    (merge-nested-context! c/current-mdc-context context))
+  ([dest context]
     (let [^HashMap delta (HashMap. (count context))
           deleted-keys   (ArrayList.)
           remove-key     (fn [^String str-k] (.remove delta str-k) (.add deleted-keys str-k))]
@@ -105,7 +108,7 @@
                   (if (and (nil? v) (not k-next))  ; consider nil values as deletion request
                     (remove-key k-head)
                     (.put delta k-head (let [value-map (or (get delta k-head)
-                                                         (when-let [oldval (MDC/get k-head)]
+                                                         (when-let [oldval (t/get-val dest k-head)]
                                                            (let [oldmap (c/destringify-val oldval)]
                                                              (if (map? oldmap) oldmap {}))))]
                                          (if (nil? v)  ; consider nil values as deletion request
@@ -120,10 +123,7 @@
       (doseq [^Map$Entry pair (.entrySet delta)]
         (let [str-k (.getKey pair)
               v     (.getValue pair)]
-          (MDC/put str-k (c/stringify-val v))))
+          (t/put! dest str-k (c/stringify-val v))))
       ;; remove keys identified for deletion
       (doseq [^String str-k deleted-keys]
-        (MDC/remove str-k))))
-  ([context absent-k]
-    (when-not (nested-context-val absent-k)
-      (merge-nested-context! context))))
+        (t/remove! dest str-k)))))
