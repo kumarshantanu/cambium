@@ -96,9 +96,9 @@
           deleted-keys   (ArrayList.)
           remove-key     (fn [^String str-k] (.remove delta str-k) (.add deleted-keys str-k))]
       ;; build up a delta with top-level stringified keys and original vals
-      (doseq [pair (seq context)]
-        (let [k (first pair)
-              v (second pair)]
+      (doseq [^Map$Entry entry (seq context)]
+        (let [k (.getKey entry)
+              v (.getValue entry)]
           (when-not (nil? k)
             (if (coll? k)
               (when (and (seq k) (every? #(not (nil? %)) k))

@@ -84,9 +84,9 @@
   ([context]
     (merge-logging-context! current-mdc-context context))
   ([dest context]
-    (doseq [pair (seq context)]
-      (let [k (first pair)
-            v (second pair)]
+    (doseq [^Map$Entry entry (seq context)]
+      (let [k (.getKey entry)
+            v (.getValue entry)]
         (when-not (nil? k)
           (if (nil? v)  ; consider nil values as deletion request
             (t/remove! dest (stringify-key k))
