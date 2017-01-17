@@ -10,7 +10,8 @@ None
 
 * Add abstract type for mutable context updates
 * [BREAKING CHANGE] Drop API for conditional update of logging context
-* Add arity to fns dealing with context to work with custom destination
+* Add arity to fns dealing with context to work with custom context holders
+* Bump SLF4j-API dependency version to `1.7.22`
 
 
 ## 0.7.0 / 2016-September-29
