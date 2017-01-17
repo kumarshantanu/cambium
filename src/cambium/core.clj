@@ -42,16 +42,16 @@
 
 (extend-protocol t/IMutableContext
   HashMap
-  (get-val [this k]   (.get this (stringify-key k)))
-  (put!    [this k v] (.put this (stringify-key k) (stringify-val v)))
-  (remove! [this k]   (.remove this (stringify-key k))))
+  (get-val [this k]   (.get this k))
+  (put!    [this k v] (.put this k v))
+  (remove! [this k]   (.remove this k)))
 
 
 (def current-mdc-context
   (reify t/IMutableContext
-    (get-val [_ k]   (MDC/get (stringify-key k)))
-    (put!    [_ k v] (MDC/put (stringify-key k) (stringify-val v)))
-    (remove! [_ k]   (MDC/remove (stringify-key k)))))
+    (get-val [_ k]   (MDC/get k))
+    (put!    [_ k v] (MDC/put k v))
+    (remove! [_ k]   (MDC/remove k))))
 
 
 ;; ----- MDC handling -----
