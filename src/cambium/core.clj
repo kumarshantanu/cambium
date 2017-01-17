@@ -69,8 +69,8 @@
   "Return the value of the specified key from the current context; behavior for non-existent keys would be
   implementation dependent - it may return nil or may throw exception."
   ([k]
-    (context-val current-mdc-context k))
-  ([repo k]
+    (context-val current-mdc-context stringify-key destringify-val k))
+  ([repo stringify-key destringify-val k]
     (destringify-val (t/get-val repo (stringify-key k)))))
 
 
@@ -82,8 +82,8 @@
   * Keys in the current context continue to have old values unless they are overridden by the specified context map
   * Keys in the context map may not be nested (for nesting support consider 'cambium.nested/merge-nested-context!')"
   ([context]
-    (merge-logging-context! current-mdc-context context))
-  ([dest context]
+    (merge-logging-context! current-mdc-context stringify-key stringify-val destringify-val context))
+  ([dest stringify-key stringify-val destringify-val context]
     (doseq [^Map$Entry entry (seq context)]
       (let [k (.getKey entry)
             v (.getValue entry)]
