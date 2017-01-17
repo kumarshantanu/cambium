@@ -3,10 +3,11 @@
 
 ## TODO
 
-None
+* [TODO] Split codec and context API into separate namespaces
+  * Maybe modularize them by putting into separate repos
 
 
-## 0.8.0 / 2017-January-??
+## 0.8.0 / 2017-January-17
 
 * Add abstract type for mutable context updates
 * [BREAKING CHANGE] Drop API for conditional update of logging context

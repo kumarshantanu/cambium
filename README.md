@@ -6,7 +6,7 @@ Clojure wrapper for [SLF4j](http://www.slf4j.org/) with
 
 ## Usage
 
-Leiningen coordinates: `[cambium "0.7.0"]`
+Leiningen coordinates: `[cambium "0.8.0"]`
 
 _Note: Cambium only wraps over SLF4j. You also need a suitable SLF4j implementation, such as
 [logback-bundle](https://github.com/kumarshantanu/logback-bundle) as your project dependency._
@@ -120,7 +120,7 @@ Now see nesting-navigation example below:
 
 ## License
 
-Copyright © 2015-2016 Shantanu Kumar (kumar.shantanu@gmail.com, shantanu.kumar@concur.com)
+Copyright © 2015-2017 Shantanu Kumar (kumar.shantanu@gmail.com, shantanu.kumar@concur.com)
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
