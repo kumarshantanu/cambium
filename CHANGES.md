@@ -7,6 +7,11 @@
   * Maybe modularize them by putting into separate repos
 
 
+## [WIP] 0.8.1 / 2017-February-??
+
+* [TODO] Avoid `NullPointerException` when setting nil logging context
+
+
 ## 0.8.0 / 2017-January-17
 
 * Add abstract type for mutable context updates
