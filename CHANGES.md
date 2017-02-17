@@ -7,7 +7,7 @@
   * Maybe modularize them by putting into separate repos
 
 
-## [WIP] 0.8.1 / 2017-February-??
+## 0.8.1 / 2017-February-17
 
 * Avoid `NullPointerException` when setting `nil` logging context
 
