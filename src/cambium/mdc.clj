@@ -31,7 +31,9 @@
   See also: http://logback.qos.ch/manual/mdc.html"
   [mdc & body]
   `(preserving-mdc
-     (MDC/setContextMap ~mdc)
+     (if-let [mdc# ~mdc]
+       (MDC/setContextMap mdc#)
+       (MDC/clear))
      ~@body))
 
 

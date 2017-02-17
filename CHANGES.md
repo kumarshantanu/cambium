@@ -9,7 +9,7 @@
 
 ## [WIP] 0.8.1 / 2017-February-??
 
-* [TODO] Avoid `NullPointerException` when setting nil logging context
+* Avoid `NullPointerException` when setting `nil` logging context
 
 
 ## 0.8.0 / 2017-January-17

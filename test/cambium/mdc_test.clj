@@ -28,6 +28,8 @@
             ([dummy arg]))]
     (testing "with-raw-mdc"
       (is (nil? (c/context-val "foo")) "Attribute not set must be absent before override")
+      (m/with-raw-mdc nil
+        (do :nothing))
       (m/with-raw-mdc context-old
         (f)
         (m/with-raw-mdc context-new
