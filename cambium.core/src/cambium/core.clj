@@ -11,30 +11,13 @@
   (:require
     [clojure.tools.logging      :as ctl]
     [clojure.tools.logging.impl :as ctl-impl]
+    [cambium.codec              :as codec]
     [cambium.internal           :as i]
     [cambium.mdc                :as m]
     [cambium.type               :as t])
   (:import
     [java.util HashMap Map$Entry]
     [org.slf4j MDC]))
-
-
-;; ----- global var hooks (with simple defaults) for MDC codec -----
-
-
-(def ^:redef stringify-key
-  "Arity-1 fn to convert MDC key into a string. By default this carries out a plain string conversion."
-  i/as-str)
-
-
-(def ^:redef stringify-val
-  "Arity-1 fn to convert MDC value into a string. By default this carries out a plain string conversion."
-  i/as-str)
-
-
-(def ^:redef destringify-val
-  "Arity-1 fn to convert MDC string back to original value. By default this simply returns the stored String value."
-  identity)
 
 
 ;; ----- MDC read/write -----
@@ -62,14 +45,14 @@
   ^java.util.Map []
   (let [cm (MDC/getCopyOfContextMap)
         ks (keys cm)]
-    (zipmap ks (map #(destringify-val (get cm %)) ks))))
+    (zipmap ks (map #(codec/destringify-val (get cm %)) ks))))
 
 
 (defn ^:redef context-val
   "Return the value of the specified key from the current context; behavior for non-existent keys would be
   implementation dependent - it may return nil or may throw exception."
   ([k]
-    (context-val current-mdc-context stringify-key destringify-val k))
+    (context-val current-mdc-context codec/stringify-key codec/destringify-val k))
   ([repo stringify-key destringify-val k]
     (destringify-val (t/get-val repo (stringify-key k)))))
 
@@ -82,7 +65,7 @@
   * Keys in the current context continue to have old values unless they are overridden by the specified context map
   * Keys in the context map may not be nested (for nesting support consider 'cambium.nested/merge-nested-context!')"
   ([context]
-    (merge-logging-context! current-mdc-context stringify-key stringify-val destringify-val context))
+    (merge-logging-context! current-mdc-context codec/stringify-key codec/stringify-val codec/destringify-val context))
   ([dest stringify-key stringify-val destringify-val context]
     (doseq [^Map$Entry entry (seq context)]
       (let [k (.getKey entry)

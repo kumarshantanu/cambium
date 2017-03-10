@@ -10,6 +10,7 @@
 (ns cambium.core-test
   (:require
     [clojure.test :refer :all]
+    [cambium.codec :as codec]
     [cambium.core :as c]
     [cambium.test-util :as tu]))
 
@@ -59,7 +60,7 @@
     (testing "deletion via nil values"
       (c/with-logging-context context-old
         (c/with-logging-context {:foo nil}
-          (is (not (contains? (c/get-context) (c/stringify-key :foo)))))))
+          (is (not (contains? (c/get-context) (codec/stringify-key :foo)))))))
     (testing "wrap-raw-mdc"
       (is (nil? (c/context-val :foo)))
       ((c/wrap-logging-context context-old f))

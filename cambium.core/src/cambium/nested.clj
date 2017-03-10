@@ -17,6 +17,7 @@
     [clojure.edn                :as edn]
     [clojure.tools.logging      :as ctl]
     [clojure.tools.logging.impl :as ctl-impl]
+    [cambium.codec    :as codec]
     [cambium.core     :as c]
     [cambium.internal :as i]
     [cambium.mdc      :as m]
@@ -75,7 +76,7 @@
   "Return the value of the specified key (or keypath in nested structure) from the current context; behavior for
   non-existent keys would be implementation dependent - it may return nil or may throw exception."
   ([k]
-    (nested-context-val c/current-mdc-context c/stringify-key c/destringify-val k))
+    (nested-context-val c/current-mdc-context codec/stringify-key codec/destringify-val k))
   ([repo stringify-key destringify-val k]
     (let [mdc-val #(destringify-val (t/get-val repo (stringify-key %)))]
       (if (coll? k)
@@ -90,7 +91,7 @@
   * Collection keys are treated as key-path (all tokens in a key path are turned into string)
   * Keys are converted to string"
   ([context]
-    (merge-nested-context! c/current-mdc-context c/stringify-key c/stringify-val c/destringify-val context))
+    (merge-nested-context! c/current-mdc-context codec/stringify-key codec/stringify-val codec/destringify-val context))
   ([dest stringify-key stringify-val destringify-val context]
     (let [^HashMap delta (HashMap. (count context))
           deleted-keys   (ArrayList.)

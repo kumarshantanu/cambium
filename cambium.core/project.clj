@@ -6,7 +6,9 @@
   :dependencies [[org.slf4j/slf4j-api       "1.7.22"]
                  [org.clojure/tools.logging "0.3.1" :exclusions [org.clojure/clojure]]]
   :global-vars {*warn-on-reflection* true}
-  :profiles {:provided {:dependencies [[org.clojure/clojure "1.5.1"]]}
+  :profiles {:provided {:dependencies [[org.clojure/clojure "1.5.1"]
+                                       [cambium/cambium.codec-simple "0.9.0-SNAPSHOT"]]}
+             :codec-simple {:dependencies [[cambium/cambium.codec-simple "0.9.0-SNAPSHOT"]]}
              :dev {:dependencies [[org.clojure/tools.nrepl "0.2.10"]]}
              :logback {:dependencies [[ch.qos.logback/logback-classic "1.1.7"]
                                       [ch.qos.logback/logback-core    "1.1.7"]]}

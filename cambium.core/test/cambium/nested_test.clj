@@ -10,6 +10,7 @@
 (ns cambium.nested-test
   (:require
     [clojure.test :refer :all]
+    [cambium.codec  :as codec]
     [cambium.core   :as c]
     [cambium.nested :as n]
     [cambium.test-util :as tu]))
@@ -17,10 +18,10 @@
 
 (deftest type-safe-encoding
   (testing "type-safe encoding"
-    (let [sk c/stringify-key]
-      (with-redefs [c/stringify-key (fn ^String [x] (.replace ^String (sk x) \- \_))
-                    c/stringify-val n/encode-val
-                    c/destringify-val n/decode-val]
+    (let [sk codec/stringify-key]
+      (with-redefs [codec/stringify-key (fn ^String [x] (.replace ^String (sk x) \- \_))
+                    codec/stringify-val n/encode-val
+                    codec/destringify-val n/decode-val]
         (c/info "hello")
         (c/info {:foo-k "bar" :baz 10 :qux true} "hello with context")
         (c/with-logging-context {:extra-k "context" "some-data" [1 2 :three 'four]}
@@ -61,10 +62,10 @@
       (tu/metrics {[:app :module] "registration"} (ex-info "some error" {:data :foo}) "internal error")
       (tu/txn-metrics {:module "order-fetch"} "Fetched order #4568"))
     (testing "type-safe encoding"
-      (let [sk c/stringify-key]
-        (with-redefs [c/stringify-key (fn ^String [x] (.replace ^String (sk x) \- \_))
-                      c/stringify-val n/encode-val
-                      c/destringify-val n/decode-val]
+      (let [sk codec/stringify-key]
+        (with-redefs [codec/stringify-key (fn ^String [x] (.replace ^String (sk x) \- \_))
+                      codec/stringify-val n/encode-val
+                      codec/destringify-val n/decode-val]
           (c/info "hello")
           (c/info {:foo-k "bar" :baz 10 :qux true} "hello with context")
           (c/with-logging-context {:extra-k "context" "some-data" [1 2 :three 'four]}
@@ -76,8 +77,8 @@
 
 
 (deftest test-context-propagation
-  (with-redefs [c/stringify-val n/encode-val
-                c/destringify-val n/decode-val
+  (with-redefs [codec/stringify-val n/encode-val
+                codec/destringify-val n/decode-val
                 c/context-val n/nested-context-val
                 c/merge-logging-context! n/merge-nested-context!]
     (let [context-old {:foo :bar
@@ -102,8 +103,8 @@
            (is (= 10 (c/context-val :foo)))
            (is (= "quux" (c/context-val :baz)) "Delta context override must not remove non-overridden attributes")
            (is (= "baz" (c/context-val :bar))))
-         (with-redefs [c/stringify-val   n/encode-val
-                       c/destringify-val n/decode-val]
+         (with-redefs [codec/stringify-val   n/encode-val
+                       codec/destringify-val n/decode-val]
            (c/with-logging-context nested-diff
              (is (= {"learn-to-fly" {"title" "learn to fly"
                                      "year" 1999}
@@ -129,14 +130,14 @@
      (testing "deletion via nil values"
        (c/with-logging-context context-old
          (c/with-logging-context {:foo nil}
-           (is (not (contains? (c/get-context) (c/stringify-key :foo))))))
+           (is (not (contains? (c/get-context) (codec/stringify-key :foo))))))
        (c/with-logging-context {:foo {:bar {:baz 10}}}
          (c/with-logging-context {[:foo :bar :baz] nil}
-           (is (= {(c/stringify-key :bar) {}} (c/context-val :foo))))
+           (is (= {(codec/stringify-key :bar) {}} (c/context-val :foo))))
          (c/with-logging-context {[:foo :bar] nil}
            (is (= {} (c/context-val :foo))))
          (c/with-logging-context {[:foo] nil}
-           (is (not (contains? (c/get-context) (c/stringify-key :foo)))))))
+           (is (not (contains? (c/get-context) (codec/stringify-key :foo)))))))
      (testing "wrap-raw-mdc"
        (is (nil? (c/context-val :foo)))
        ((c/wrap-logging-context context-old f))
