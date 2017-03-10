@@ -6,6 +6,7 @@
 
 ## [WIP] 0.9.0 / 2017-March-??
 
+* Split project into modules cambium.codec and cambium.core
 * [TODO] Split codec and core (context) API into separate namespaces in separate repos
   * No need for `alter-var-root` anymore
 * [TODO] Add a var to detect whether nested log attributes are supported by the codec

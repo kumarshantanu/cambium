@@ -1,4 +1,4 @@
-(defproject cambium "0.8.1"
+(defproject cambium/cambium.core "0.9.0-SNAPSHOT"
   :description "Clojure wrapper for SLF4j with MDC and clojure/tools.logging"
   :url "https://github.com/kumarshantanu/cambium"
   :license {:name "Eclipse Public License"
