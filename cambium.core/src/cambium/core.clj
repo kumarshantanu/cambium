@@ -52,7 +52,7 @@
   * Keys are converted to string
   * Keys in the current context continue to have old values unless they are overridden by the specified context map
   * Nested keys are handled subject to `cambium.codec/nested-nav?`."
-  ([context] (print "nested-nav?" codec/nested-nav?)
+  ([context]
     (if codec/nested-nav?
       (impl/merge-nested-context! context)
       (impl/merge-flat-context! context)))

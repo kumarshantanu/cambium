@@ -53,7 +53,7 @@
   * Keys are converted to string
   * Keys in the current context continue to have old values unless they are overridden by the specified context map
   * Keys in the context map may not be nested (for nesting support consider 'cambium.nested/merge-nested-context!')"
-  ([context] (println "flat.....")
+  ([context]
     (merge-flat-context! current-mdc-context codec/stringify-key codec/stringify-val codec/destringify-val context))
   ([dest stringify-key stringify-val destringify-val context]
     (doseq [^Map$Entry entry (seq context)]

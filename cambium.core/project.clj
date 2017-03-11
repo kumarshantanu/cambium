@@ -6,8 +6,7 @@
   :dependencies [[org.slf4j/slf4j-api       "1.7.22"]
                  [org.clojure/tools.logging "0.3.1" :exclusions [org.clojure/clojure]]]
   :global-vars {*warn-on-reflection* true}
-  :profiles {:provided {:dependencies [[org.clojure/clojure "1.5.1"]
-                                       [cambium/cambium.codec-simple "0.9.0-SNAPSHOT"]]}
+  :profiles {:provided {:dependencies [[org.clojure/clojure "1.5.1"]]}
              :codec-simple {:dependencies [[cambium/cambium.codec-simple "0.9.0-SNAPSHOT"]]}
              :nested-test  {:test-paths ["nested-test"]}
              :dev {:dependencies [[org.clojure/tools.nrepl "0.2.10"]]}
