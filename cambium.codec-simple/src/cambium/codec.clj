@@ -27,7 +27,7 @@
     :otherwise              (.toString x)))
 
 
-;; ----- fns below are part of the contract -----
+;; ----- below are parts of the contract -----
 
 
 (def ^:const nested-nav?
