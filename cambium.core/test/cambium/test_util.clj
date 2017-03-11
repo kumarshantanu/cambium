@@ -9,8 +9,7 @@
 
 (ns cambium.test-util
   (:require
-    [cambium.core :as c]
-    [cambium.core :as n]))
+    [cambium.core :as c]))
 
 
 (c/deflogger metrics "METRICS")
