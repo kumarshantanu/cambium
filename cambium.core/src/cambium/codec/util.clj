@@ -12,6 +12,22 @@
     [clojure.edn :as edn]))
 
 
+(defn as-str
+  "Turn given argument into string."
+  ^String [^Object x]
+  (cond
+    (instance?
+      clojure.lang.Named x) (if-let [^String the-ns (namespace x)]
+                              (let [^StringBuilder sb (StringBuilder. the-ns)]
+                                (.append sb \/)
+                                (.append sb (name x))
+                                (.toString sb))
+                              (name x))
+    (instance? String x)    x
+    (nil? x)                ""
+    :otherwise              (.toString x)))
+
+
 ;; ----- Codec (default: EDN codec) helper -----
 
 

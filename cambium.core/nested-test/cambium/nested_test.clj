@@ -19,10 +19,7 @@
 (deftest type-safe-encoding
   (testing "type-safe encoding"
     (let [sk codec/stringify-key]
-      (with-redefs [codec/nested-nav? true
-                    codec/stringify-key (fn ^String [x] (.replace ^String (sk x) \- \_))
-                    codec/stringify-val ccu/encode-val
-                    codec/destringify-val ccu/decode-val]
+      (with-redefs [codec/stringify-key (fn ^String [x] (.replace ^String (sk x) \- \_))]
         (c/info "hello")
         (c/info {:foo-k "bar" :baz 10 :qux true} "hello with context")
         (c/with-logging-context {:extra-k "context" "some-data" [1 2 :three 'four]}
@@ -46,7 +43,7 @@
 
 
 (deftest log-test
-  (with-redefs [codec/nested-nav? true]
+  (with-redefs [codec/stringify-val ccu/as-str]
     (testing "Normal scenarios"
       (c/info "hello")
       (c/info {:foo "bar" :baz 10 :qux true} "hello with context")
@@ -77,8 +74,7 @@
 
 
 (deftest test-context-propagation
-  (with-redefs [;;codec/nested-nav? true
-                codec/stringify-val ccu/encode-val
+  (with-redefs [codec/stringify-val ccu/encode-val
                 codec/destringify-val ccu/decode-val]
     (let [context-old {:foo :bar
                        :baz :quux}
@@ -102,10 +98,9 @@
             (is (= 10 (c/context-val :foo)))
             (is (= "quux" (c/context-val :baz)) "Delta context override must not remove non-overridden attributes")
             (is (= "baz" (c/context-val :bar))))
-          (with-redefs [;;codec/nested-nav? true
-                        codec/stringify-val   ccu/encode-val
+          (with-redefs [codec/stringify-val   ccu/encode-val
                         codec/destringify-val ccu/decode-val]
-            (c/with-logging-context nested-diff (println "************" (c/get-context))
+            (c/with-logging-context nested-diff
               (is (= {"learn-to-fly" {"title" "learn to fly"
                                       "year" 1999}
                       "best-of-you"  {"title" "best of you"
