@@ -19,7 +19,9 @@
 (deftest type-safe-encoding
   (testing "type-safe encoding"
     (let [sk codec/stringify-key]
-      (with-redefs [codec/stringify-key (fn ^String [x] (.replace ^String (sk x) \- \_))]
+      (with-redefs [codec/stringify-key (fn ^String [x] (.replace ^String (sk x) \- \_))
+                    codec/stringify-val ccu/encode-val
+                    codec/destringify-val ccu/decode-val]
         (c/info "hello")
         (c/info {:foo-k "bar" :baz 10 :qux true} "hello with context")
         (c/with-logging-context {:extra-k "context" "some-data" [1 2 :three 'four]}
@@ -43,7 +45,7 @@
 
 
 (deftest log-test
-  (with-redefs [codec/stringify-val ccu/as-str]
+  (with-redefs [codec/nested-nav? true]
     (testing "Normal scenarios"
       (c/info "hello")
       (c/info {:foo "bar" :baz 10 :qux true} "hello with context")
@@ -75,7 +77,8 @@
 
 (deftest test-context-propagation
   (with-redefs [codec/stringify-val ccu/encode-val
-                codec/destringify-val ccu/decode-val]
+                codec/destringify-val ccu/decode-val
+                codec/nested-nav? true]
     (let [context-old {:foo :bar
                        :baz :quux}
           context-new {:foo 10
