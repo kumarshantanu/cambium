@@ -13,28 +13,11 @@
     [clojure.tools.logging.impl :as ctl-impl]
     [cambium.codec              :as codec]
     [cambium.internal           :as i]
-    [cambium.mdc                :as m]
-    [cambium.type               :as t])
+    [cambium.impl               :as impl]
+    [cambium.mdc                :as m])
   (:import
     [java.util HashMap Map$Entry]
     [org.slf4j MDC]))
-
-
-;; ----- MDC read/write -----
-
-
-(extend-protocol t/IMutableContext
-  HashMap
-  (get-val [this k]   (.get this k))
-  (put!    [this k v] (.put this k v))
-  (remove! [this k]   (.remove this k)))
-
-
-(def current-mdc-context
-  (reify t/IMutableContext
-    (get-val [_ k]   (MDC/get k))
-    (put!    [_ k v] (MDC/put k v))
-    (remove! [_ k]   (MDC/remove k))))
 
 
 ;; ----- MDC handling -----
@@ -48,32 +31,35 @@
     (zipmap ks (map #(codec/destringify-val (get cm %)) ks))))
 
 
-(defn ^:redef context-val
+(defn context-val
   "Return the value of the specified key from the current context; behavior for non-existent keys would be
-  implementation dependent - it may return nil or may throw exception."
+  implementation dependent - it may return nil or may throw exception. Nested keys are handled subject to
+  `cambium.codec/nested-nav?`."
   ([k]
-    (context-val current-mdc-context codec/stringify-key codec/destringify-val k))
+    (if codec/nested-nav?
+      (impl/nested-context-val k)
+      (impl/flat-context-val k)))
   ([repo stringify-key destringify-val k]
-    (destringify-val (t/get-val repo (stringify-key k)))))
+    (if codec/nested-nav?
+      (impl/nested-context-val repo stringify-key destringify-val k)
+      (impl/flat-context-val repo stringify-key destringify-val k))))
 
 
-(defn ^:redef merge-logging-context!
+(defn merge-logging-context!
   "Merge given context map into the current MDC using the following constraints:
   * Nil keys are ignored
   * Nil values are considered as deletion-request for corresponding keys
   * Keys are converted to string
   * Keys in the current context continue to have old values unless they are overridden by the specified context map
-  * Keys in the context map may not be nested (for nesting support consider 'cambium.nested/merge-nested-context!')"
-  ([context]
-    (merge-logging-context! current-mdc-context codec/stringify-key codec/stringify-val codec/destringify-val context))
+  * Nested keys are handled subject to `cambium.codec/nested-nav?`."
+  ([context] (print "nested-nav?" codec/nested-nav?)
+    (if codec/nested-nav?
+      (impl/merge-nested-context! context)
+      (impl/merge-flat-context! context)))
   ([dest stringify-key stringify-val destringify-val context]
-    (doseq [^Map$Entry entry (seq context)]
-      (let [k (.getKey entry)
-            v (.getValue entry)]
-        (when-not (nil? k)
-          (if (nil? v)  ; consider nil values as deletion request
-            (t/remove! dest (stringify-key k))
-            (t/put! dest (stringify-key k) (stringify-val v))))))))
+    (if codec/nested-nav?
+      (impl/merge-nested-context! dest stringify-key stringify-val destringify-val context)
+      (impl/merge-flat-context! dest stringify-key stringify-val destringify-val context))))
 
 
 (defmacro with-logging-context
