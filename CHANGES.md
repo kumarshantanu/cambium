@@ -6,11 +6,13 @@
 
 ## [WIP] 0.9.0 / 2017-March-??
 
-* Split project into modules cambium.codec and cambium.core
-* Split codec and core (context) API into separate namespaces in separate repos
+* Split project into modules (separate namespaces) cambium.codec and cambium.core
   * No need for `alter-var-root` anymore
 * Add a var to detect whether nested log attributes are supported by the codec
+  * `cambium.codec/nested-nav?`
 * Unify merge and merge-nested context into a single interface
+  * `cambium.core/context-val`
+  * `cambium.core/merge-logging-context!`
 * [TODO] Make flat context operations have no-op effect for nested navigation
 * [TODO] Update SLF4j dependency
 
