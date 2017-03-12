@@ -3,7 +3,7 @@
   :url "https://github.com/kumarshantanu/cambium"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[org.slf4j/slf4j-api       "1.7.22"]
+  :dependencies [[org.slf4j/slf4j-api       "1.7.24"]
                  [org.clojure/tools.logging "0.3.1" :exclusions [org.clojure/clojure]]]
   :global-vars {*warn-on-reflection* true}
   :profiles {:provided {:dependencies [[org.clojure/clojure "1.5.1"]]}
