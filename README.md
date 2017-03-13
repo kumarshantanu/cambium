@@ -129,7 +129,7 @@ Value based context can be propagated as follows:
   ...)
 
 ;; wrap an existing fn with specified context
-(log/wrap-logging-context {:user-id "X1234"} user-assign-job)  ; creates a wrapped fn that inherits specified context
+(log/wrap-logging-context {:user-id "X1234"} user-assign-job)  ; creates a wrapped fn inheriting specified context
 ```
 
 
