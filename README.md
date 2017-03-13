@@ -176,14 +176,14 @@ One-time initialization in the project:
 See nesting-navigation example below:
 
 ```clojure
-(c/with-logging-context {:order {:client "XYZ Corp"
-                                 :item-count 10}}
+(log/with-logging-context {:order {:client "XYZ Corp"
+                                   :item-count 10}}
   ;; ..other processing..
-  (c/with-logging-context {[:order :id] "F-123456"}
+  (log/with-logging-context {[:order :id] "F-123456"}
     ;; here the context will be {"order" {"client" "XYZ Corp" "item-count" 10 "id" "F-123456"}}
-    (c/info "Order processed successfully")))
-;; Logging API in the 'nested' namespace accepts nested MDC
-(c/info {:order {:event-id "foo"}} "Foo happened")
+    (log/info "Order processed successfully")))
+;; the logging API processes nested MDC correctly when the codec is nesting-capable
+(log/info {:order {:event-id "foo"}} "Foo happened")
 ```
 
 ## License
