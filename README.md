@@ -1,6 +1,6 @@
 # cambium
 
-Logs as data in Clojure with [SLF4j](http://www.slf4j.org/)
+Logs as data in Clojure. Uses [SLF4j](http://www.slf4j.org/)
 [Mapped Diagnostic Context (MDC)](http://www.slf4j.org/api/org/slf4j/MDC.html) and
 [clojure/tools.logging](https://github.com/clojure/tools.logging).
 
