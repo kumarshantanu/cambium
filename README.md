@@ -33,10 +33,10 @@ layout. A codec constitutes the following:
 
 | Var in `cambium.codec` ns       | Type    | Description |
 |---------------------------------|---------|-------------|
-| `cambium.codec/nested-nav?`     | Boolean | `true` makes Cambium treat context read/write in nesting-aware fashion |
-| `cambium.codec/stringify-key`   | Fn/1    | Encodes log attribute key as string   |
-| `cambium.codec/stringify-val`   | Fn/1    | Encodes log attribute value as string |
-| `cambium.codec/destringify-val` | Fn/1    | Decodes log attribute from string form |
+| `cambium.codec/nested-nav?`     | Boolean | Whether context read/write should be nesting-aware |
+| `cambium.codec/stringify-key`   | Fn/1    | Encodes log attribute key as string                |
+| `cambium.codec/stringify-val`   | Fn/1    | Encodes log attribute value as string              |
+| `cambium.codec/destringify-val` | Fn/1    | Decodes log attribute from string form             |
 
 _Note: You need only one codec implementation in a project._
 
