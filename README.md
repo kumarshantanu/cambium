@@ -4,8 +4,8 @@ Logs as data in Clojure with [SLF4j](http://www.slf4j.org/)
 [Mapped Diagnostic Context (MDC)](http://www.slf4j.org/api/org/slf4j/MDC.html) and
 [clojure/tools.logging](https://github.com/clojure/tools.logging).
 
-Your log event should not be restricted to a generic text, e.g. `Registration failed`. It should also be able to
-capture and emit relevant log attributes (JSON example below, there could also be other formats):
+A log event should not be restricted to a generic text, e.g. `Registration failed`. It should also be able to
+capture and emit associated log attributes (JSON example below, there could also be other formats):
 
 ```json
 {"message": "Registration failed",
@@ -28,17 +28,17 @@ Leiningen coordinates:
 
 ### What is a Cambium codec?
 
-A Cambium codec governs how the log attributes are encoded and decoded before they are effectively sent to an appender.
-A codec constitutes the following:
+A Cambium codec governs how the log attributes are encoded and decoded before they are effectively sent to a log
+layout. A codec constitutes the following:
 
-| Var in `cambium.codec` ns       | Type and description |
-|---------------------------------|-------------|
-| `cambium.codec/nested-nav?`     | Boolean: `true` makes Cambium treat context read/write in nesting-aware fashion |
-| `cambium.codec/stringify-key`   | Fn/1: encodes log attribute key as string   |
-| `cambium.codec/stringify-val`   | Fn/1: encodes log attribute value as string |
-| `cambium.codec/destringify-val` | Fn/1: decodes log attribute from string form |
+| Var in `cambium.codec` ns       | Type    | Description |
+|---------------------------------|---------|-------------|
+| `cambium.codec/nested-nav?`     | Boolean | `true` makes Cambium treat context read/write in nesting-aware fashion |
+| `cambium.codec/stringify-key`   | Fn/1    | Encodes log attribute key as string   |
+| `cambium.codec/stringify-val`   | Fn/1    | Encodes log attribute value as string |
+| `cambium.codec/destringify-val` | Fn/1    | Decodes log attribute from string form |
 
-_Note: You need only either of the codec implementations at one time._
+_Note: You need only one codec implementation in a project._
 
 
 ### Quickstart
@@ -51,16 +51,15 @@ Cambium only wraps over SLF4j. You also need a suitable SLF4j implementation, su
 Dependencies (see [logback-bundle](https://github.com/kumarshantanu/logback-bundle) for Logback artifacts):
 
 ```clojure
-[cambium/cambium.core           "0.9.0-SNAPSHOT"]
-[cambium/cambium.codec-simple   "0.9.0-SNAPSHOT"]
-[logback-bundle/json-bundle     "0.2.4"]
+[cambium/cambium.core         "0.9.0-SNAPSHOT"]
+[cambium/cambium.codec-simple "0.9.0-SNAPSHOT"]
+[logback-bundle/json-bundle   "0.2.4"]
 ```
 
 Logback configuration (file `logback.xml` in project `resources` folder):
 
 ```xml
 <configuration>
-
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
           <layout class="logback_bundle.json.FlatJsonLayout">
@@ -75,11 +74,9 @@ Logback configuration (file `logback.xml` in project `resources` folder):
           </layout>
         </encoder>
     </appender>
-
     <root level="debug">
       <appender-ref ref="STDOUT" />
     </root>
-
 </configuration>
 ```
 
@@ -135,6 +132,7 @@ Value based context can be propagated as follows:
 (log/wrap-logging-context {:user-id "X1234"} user-assign-job)  ; creates a wrapped fn that inherits specified context
 ```
 
+
 #### MDC propagation
 
 Unlike value based propagation MDC propagation happens wholesale, i.e. the entire current MDC map is replaced with a
@@ -154,10 +152,28 @@ new map. Also, no conversion is applied to MDC; they are required to have string
 
 #### Nested context
 
-_Note: This requires special logging layout implementation that can decode the encoded context._
-
 Context values sometimes may be nested and need manipulation. Cambium requires nesting aware codec for dealing with
-nested context. See nesting-navigation example below:
+nested context.
+
+Example dependencies:
+
+```clojure
+[cambium/cambium.core           "0.9.0-SNAPSHOT"]
+[cambium/cambium.codec-cheshire "0.9.0-SNAPSHOT"]  ; nesting-capable codec
+[logback-bundle/json-bundle     "0.2.4"]
+```
+
+One-time initialization in the project:
+
+```clojure
+(require '[cheshire.core :as cheshire])
+(import '[logback_bundle.json FlatJsonLayout ValueDecoder])
+(FlatJsonLayout/setGlobalDecoder
+  (reify ValueDecoder
+    (decode [this encoded-value] (cheshire/parse-string encoded-value))))
+```
+
+See nesting-navigation example below:
 
 ```clojure
 (c/with-logging-context {:order {:client "XYZ Corp"
