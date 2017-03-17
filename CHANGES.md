@@ -14,7 +14,7 @@
 * Unify flat and nested context operations into single interfaces
   * `cambium.core/context-val`
   * `cambium.core/merge-logging-context!`
-* Update SLF4j dependency to `1.7.24`
+* Update SLF4j dependency to `1.7.25`
 
 
 ## 0.8.1 / 2017-February-17
