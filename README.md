@@ -26,21 +26,6 @@ Leiningen coordinates:
 | `[cambium/cambium.codec-cheshire "0.9.0-SNAPSHOT"]` | JSON codec using Cheshire, nesting-capable |
 
 
-### What is a Cambium codec?
-
-A Cambium codec governs how the log attributes are encoded and decoded before they are effectively sent to a log
-layout. A codec constitutes the following:
-
-| Var in `cambium.codec` ns       | Type    | Description |
-|---------------------------------|---------|-------------|
-| `cambium.codec/nested-nav?`     | Boolean | Whether context read/write should be nesting-aware |
-| `cambium.codec/stringify-key`   | Fn/1    | Encodes log attribute key as string                |
-| `cambium.codec/stringify-val`   | Fn/1    | Encodes log attribute value as string              |
-| `cambium.codec/destringify-val` | Fn/1    | Decodes log attribute from string form             |
-
-_Note: You need only one codec implementation in a project._
-
-
 ### Quickstart
 
 Cambium only wraps over SLF4j. You also need a suitable SLF4j implementation, such as
@@ -81,7 +66,7 @@ Logback configuration (file `logback.xml` in project `resources` folder):
 ```
 
 
-### Requiring the namespaces:
+#### Requiring the namespaces
 
 ```clojure
 (require '[cambium.core :as log])
@@ -89,7 +74,7 @@ Logback configuration (file `logback.xml` in project `resources` folder):
 ```
 
 
-### Namespace based loggers
+#### Namespace based loggers
 
 Like `clojure.tools.logging/<log-level>`, Cambium defines namespace loggers for various levels:
 
@@ -103,7 +88,7 @@ Like `clojure.tools.logging/<log-level>`, Cambium defines namespace loggers for 
 Available log levels: `trace`, `debug`, `info`, `warn`, `error`, `fatal`
 
 
-### Custom loggers
+#### Custom loggers
 
 You can define custom loggers that you can use from any namespace as follows:
 
@@ -117,7 +102,7 @@ You can define custom loggers that you can use from any namespace as follows:
 ```
 
 
-### Context propagation
+#### Context propagation
 
 Value based context can be propagated as follows:
 
@@ -133,7 +118,7 @@ Value based context can be propagated as follows:
 ```
 
 
-#### MDC propagation
+##### MDC propagation
 
 Unlike value based propagation MDC propagation happens wholesale, i.e. the entire current MDC map is replaced with a
 new map. Also, no conversion is applied to MDC; they are required to have string keys and values. See example below:
@@ -150,7 +135,22 @@ new map. Also, no conversion is applied to MDC; they are required to have string
 (mlog/wrap-raw-mdc {"userid" "X1234"} user-assign-job)  ; creates a wrapped fn that inherits specified context
 ```
 
-#### Nested context
+### What is a Cambium codec?
+
+A Cambium codec governs how the log attributes are encoded and decoded before they are effectively sent to a log
+layout. A codec constitutes the following:
+
+| Var in `cambium.codec` ns       | Type    | Description |
+|---------------------------------|---------|-------------|
+| `cambium.codec/nested-nav?`     | Boolean | Whether context read/write should be nesting-aware |
+| `cambium.codec/stringify-key`   | Fn/1    | Encodes log attribute key as string                |
+| `cambium.codec/stringify-val`   | Fn/1    | Encodes log attribute value as string              |
+| `cambium.codec/destringify-val` | Fn/1    | Decodes log attribute from string form             |
+
+_Note: You need only one codec implementation in a project._
+
+
+### Nested context
 
 Context values sometimes may be nested and need manipulation. Cambium requires nesting aware codec for dealing with
 nested context.
