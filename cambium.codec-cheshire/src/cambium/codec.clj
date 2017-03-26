@@ -49,7 +49,10 @@
   (try
     (cheshire/generate-string x)
     (catch Exception e
-      (str x))))
+      (try
+        (cheshire/generate-string (str x))
+        (catch Exception e
+          "\"Unable to encode MDC value as JSON\"")))))
 
 
 (defn destringify-val
