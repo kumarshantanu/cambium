@@ -19,11 +19,11 @@ capture and emit associated log attributes (JSON example below, there could also
 
 Leiningen coordinates:
 
-| Leiningen artifact                                  | Description                                |
-|-----------------------------------------------------|--------------------------------------------|
-| `[cambium/cambium.core           "0.9.0-SNAPSHOT"]` | User facing core features                  |
-| `[cambium/cambium.codec-simple   "0.9.0-SNAPSHOT"]` | Simple codec, not nesting-aware            |
-| `[cambium/cambium.codec-cheshire "0.9.0-SNAPSHOT"]` | JSON codec using Cheshire, nesting-capable |
+| Leiningen artifact                         | Description                                |
+|--------------------------------------------|--------------------------------------------|
+| `[cambium/cambium.core           "0.9.0"]` | User facing core features                  |
+| `[cambium/cambium.codec-simple   "0.9.0"]` | Simple codec, not nesting-aware            |
+| `[cambium/cambium.codec-cheshire "0.9.0"]` | JSON codec using Cheshire, nesting-capable |
 
 
 ### Quickstart
@@ -36,8 +36,8 @@ Cambium only wraps over SLF4j. You also need a suitable SLF4j implementation, su
 Dependencies (see [logback-bundle](https://github.com/kumarshantanu/logback-bundle) for Logback artifacts):
 
 ```clojure
-[cambium/cambium.core         "0.9.0-SNAPSHOT"]
-[cambium/cambium.codec-simple "0.9.0-SNAPSHOT"]
+[cambium/cambium.core         "0.9.0"]
+[cambium/cambium.codec-simple "0.9.0"]
 [logback-bundle/json-bundle   "0.2.4"]
 ```
 
@@ -159,8 +159,8 @@ nested context.
 Example dependencies:
 
 ```clojure
-[cambium/cambium.core           "0.9.0-SNAPSHOT"]
-[cambium/cambium.codec-cheshire "0.9.0-SNAPSHOT"]  ; nesting-capable codec
+[cambium/cambium.core           "0.9.0"]
+[cambium/cambium.codec-cheshire "0.9.0"]  ; nesting-capable codec
 [logback-bundle/json-bundle     "0.2.4"]
 ```
 

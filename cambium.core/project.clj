@@ -1,13 +1,15 @@
-(defproject cambium/cambium.core "0.9.0-SNAPSHOT"
+(defproject cambium/cambium.core "0.9.0"
   :description "Clojure wrapper for SLF4j with MDC and clojure/tools.logging"
   :url "https://github.com/kumarshantanu/cambium"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
+  :min-lein-version "2.2.0"
+  :pedantic? :abort
   :dependencies [[org.slf4j/slf4j-api       "1.7.25"]
                  [org.clojure/tools.logging "0.3.1" :exclusions [org.clojure/clojure]]]
   :global-vars {*warn-on-reflection* true}
   :profiles {:provided {:dependencies [[org.clojure/clojure "1.5.1"]]}
-             :codec-simple {:dependencies [[cambium/cambium.codec-simple "0.9.0-SNAPSHOT"]]}
+             :codec-simple {:dependencies [[cambium/cambium.codec-simple "0.9.0"]]}
              :nested-test  {:test-paths ["nested-test"]}
              :dev {:dependencies [[org.clojure/tools.nrepl "0.2.10"]]}
              :logback {:dependencies [[ch.qos.logback/logback-classic "1.1.7"]

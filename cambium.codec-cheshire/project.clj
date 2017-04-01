@@ -1,8 +1,10 @@
-(defproject cambium/cambium.codec-cheshire "0.9.0-SNAPSHOT"
+(defproject cambium/cambium.codec-cheshire "0.9.0"
   :description "A nesting-aware codec for Cambium using Cheshire"
   :url "https://github.com/kumarshantanu/cambium"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
+  :min-lein-version "2.2.0"
+  :pedantic? :abort
   :dependencies [[cheshire "5.7.0"]]
   :global-vars {*warn-on-reflection* true
                 *unchecked-math* :warn-on-boxed}
