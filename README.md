@@ -41,7 +41,7 @@ Dependencies (see [logback-bundle](https://github.com/kumarshantanu/logback-bund
 [logback-bundle/json-bundle   "0.2.4"]
 ```
 
-Logback configuration (file `logback.xml` in project `resources` folder):
+Logback configuration (file `resources/logback.xml` in project):
 
 ```xml
 <configuration>
