@@ -4,7 +4,7 @@
 ## TODO
 
 
-## [WIP] 0.9.0 / 2017-March-??
+## [WIP] 0.9.0 / 2017-April-??
 
 * [BREAKING CHANGE] Organize project into modules (separate namespaces) - core and codec
   * Modules `cambium.core`, `cambium.codec-simple` and `cambium.codec-cheshire`
