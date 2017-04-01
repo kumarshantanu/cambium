@@ -7,75 +7,72 @@
 ;   You must not remove this notice, or any other, from this software.
 
 
-(ns cambium.nested
-  "Utility fns for handling nested context. Mostly useful for redefining vars in 'cambium.core' namespace:
-  - cambium.core/stringify-val
-  - cambium.core/destringify-val
-  - cambium.core/context-val
-  - cambium.core/merge-logging-context!"
+(ns cambium.impl
   (:require
-    [clojure.edn                :as edn]
-    [clojure.tools.logging      :as ctl]
-    [clojure.tools.logging.impl :as ctl-impl]
-    [cambium.core     :as c]
+    [cambium.codec    :as codec]
     [cambium.internal :as i]
-    [cambium.mdc      :as m]
     [cambium.type     :as t])
   (:import
-    [java.util ArrayList HashMap Map$Entry]))
+    [java.util ArrayList HashMap Map$Entry]
+    [org.slf4j MDC]))
 
 
-;; ----- Codec (default: EDN codec) helper -----
+;; ----- MDC read/write -----
 
 
-(defn encode-val
-  "Encode MDC value as string such that it retains type information. May be used to redefine cambium.core/stringify-val.
-  See: decode-val"
-  (^String [object-encoder v]
-    (let [hint-str (fn ^String [^String hint v]
-                     (let [^StringBuilder sb (StringBuilder. 15)]
-                       (.append sb hint)
-                       (.append sb v)
-                       (.toString sb)))]
-      (cond
-        (string? v)  v  ; do not follow escape-safety due to performance
-        (instance?
-          clojure.lang.Named v) (name v)
-        (integer? v) (hint-str "^long "    v)
-        (float? v)   (hint-str "^double "  v)
-        (instance?
-          Boolean v) (hint-str "^boolean " v)
-        :otherwise   (hint-str "^object "  (object-encoder v)))))
-  (^String [v]
-    (encode-val pr-str v)))
+(extend-protocol t/IMutableContext
+  HashMap  ; and LinkedHashMap, which extends HashMap
+  (get-val [this k]   (.get this k))
+  (put!    [this k v] (.put this k v))
+  (remove! [this k]   (.remove this k)))
 
 
-(defn decode-val
-  "Decode MDC string value into the correct original type. May be used to redefine cambium.core/destringify-val.
-  See: encode-val"
-  ([object-decoder ^String s]
-    (cond
-      (nil? s)             s
-      (= 0 (.length s))    s
-      (= \^ (.charAt s 0)) (cond
-                             (.startsWith s "^long ")    (try (Long/parseLong     (subs s 6)) (catch Exception e -314))
-                             (.startsWith s "^double ")  (try (Double/parseDouble (subs s 8)) (catch Exception e -3.14))
-                             (.startsWith s "^boolean ") (Boolean/parseBoolean    (subs s 9))
-                             (.startsWith s "^object ")  (try (object-decoder (subs s 8)) (catch Exception e (str e)))
-                             :otherwise                  s)
-      :otherwise           s))
-  ([^String s]
-    (decode-val edn/read-string s)))
+(def current-mdc-context
+  (reify t/IMutableContext
+    (get-val [_ k]   (MDC/get k))
+    (put!    [_ k v] (MDC/put k v))
+    (remove! [_ k]   (MDC/remove k))))
 
 
-;; ----- Nested context navigation -----
+;; ----- flat impl -----
+
+
+(defn flat-context-val
+  "Return the value of the specified key from the current context; behavior for non-existent keys would be
+  implementation dependent - it may return nil or may throw exception."
+  ([k]
+    (flat-context-val current-mdc-context codec/stringify-key codec/destringify-val k))
+  ([repo stringify-key destringify-val k]
+    (destringify-val (t/get-val repo (stringify-key k)))))
+
+
+(defn merge-flat-context!
+  "Merge given context map into the current MDC using the following constraints:
+  * Nil keys are ignored
+  * Nil values are considered as deletion-request for corresponding keys
+  * Keys are converted to string
+  * Keys in the current context continue to have old values unless they are overridden by the specified context map
+  * Keys in the context map may not be nested (for nesting support consider 'cambium.nested/merge-nested-context!')"
+  ([context]
+    (merge-flat-context! current-mdc-context codec/stringify-key codec/stringify-val codec/destringify-val context))
+  ([dest stringify-key stringify-val destringify-val context]
+    (doseq [^Map$Entry entry (seq context)]
+      (let [k (.getKey entry)
+            v (.getValue entry)]
+        (when-not (nil? k)
+          (if (nil? v)  ; consider nil values as deletion request
+            (t/remove! dest (stringify-key k))
+            (t/put! dest (stringify-key k) (stringify-val v))))))))
+
+
+;; ----- nested impl -----
 
 
 (defn nested-context-val
   "Return the value of the specified key (or keypath in nested structure) from the current context; behavior for
   non-existent keys would be implementation dependent - it may return nil or may throw exception."
   ([k]
-    (nested-context-val c/current-mdc-context c/stringify-key c/destringify-val k))
+    (nested-context-val current-mdc-context codec/stringify-key codec/destringify-val k))
   ([repo stringify-key destringify-val k]
     (let [mdc-val #(destringify-val (t/get-val repo (stringify-key %)))]
       (if (coll? k)
@@ -90,7 +87,7 @@
   * Collection keys are treated as key-path (all tokens in a key path are turned into string)
   * Keys are converted to string"
   ([context]
-    (merge-nested-context! c/current-mdc-context c/stringify-key c/stringify-val c/destringify-val context))
+    (merge-nested-context! current-mdc-context codec/stringify-key codec/stringify-val codec/destringify-val context))
   ([dest stringify-key stringify-val destringify-val context]
     (let [^HashMap delta (HashMap. (count context))
           deleted-keys   (ArrayList.)
