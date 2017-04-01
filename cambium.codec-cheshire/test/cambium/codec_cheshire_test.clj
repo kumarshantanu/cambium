@@ -39,8 +39,8 @@
     (is (= "{\"foo\":10}" (codec/stringify-val {:foo 10})) "simple map")
     (is (= "{\"foo\":{\"bar\":10}}" (codec/stringify-val {:foo {:bar 10}})) "nested map"))
   (testing "random objects"
-    (is (= "foo[a-zA-Z]+bar" (codec/stringify-val #"foo[a-zA-Z]+bar")))
-    (is (string?             (codec/stringify-val (Object.))))))
+    (is (= "\"foo[a-zA-Z]+bar\"" (codec/stringify-val #"foo[a-zA-Z]+bar")))
+    (is (string?                 (codec/stringify-val (Object.))))))
 
 
 (deftest test-destringify-val
