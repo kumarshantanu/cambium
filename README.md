@@ -76,6 +76,7 @@ Logback configuration (file `logback.xml` in project `resources` folder):
 
 #### Namespace based loggers
 
+A namespace based logger uses the namespace where the log event is originated as the logger name.
 Like `clojure.tools.logging/<log-level>`, Cambium defines namespace loggers for various levels:
 
 ```clojure
